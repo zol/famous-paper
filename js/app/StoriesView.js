@@ -13,14 +13,24 @@ define(function(require, exports, module) {
 
     var StoryView           = require('./StoryView');
     var Data                = require('./Data');
+    var Interpolate         = require('./utils/Interpolate');
 
     Transitionable.registerMethod('spring', SpringTransition);
 
     function StoriesView() {
         View.apply(this, arguments);
 
-        setupSync.call(this);
+        createSyncs.call(this);
         createStories.call(this);
+        setXListeners.call(this);
+        setYListeners.call(this);
+
+        this.scale = new Interpolate({
+            input_1: 0,
+            input_2: this.options.initCardPos,
+            output_1: 1/this.options.cardScale,
+            output_2: 1
+        });
     }
 
     StoriesView.prototype = Object.create(View.prototype);
@@ -34,12 +44,14 @@ define(function(require, exports, module) {
             dampingRatio: 0.9,
         },
 
-        storyWidth: 142,
-        storyHeight: 253,
+        cardWidth: 142,
+        cardScale: 0.445,
         gutter: 2,
         margin: 20
     };
-    StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.storyHeight)/2;
+    StoriesView.DEFAULT_OPTIONS.cardHeight = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerHeight;
+    StoriesView.DEFAULT_OPTIONS.initCardPos = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
+    StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
 
     StoriesView.prototype.slideUp = function(velocity) {
         console.log('slide up');
@@ -47,7 +59,7 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.storyPos.set(0, spring);
+        this.yPos.set(0, spring);
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
@@ -56,14 +68,29 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.storyPos.set(window.innerHeight - this.options.storyHeight, spring);
+        this.yPos.set(window.innerHeight - this.options.cardHeight, spring);
     };
 
+var scaleCache;
+
     StoriesView.prototype.render = function() {
+        var storyPos = this.yPos.get();
+        var scale = this.scale.calc(storyPos);
+
+if(scaleCache !== scale) {
+    console.log()
+    scaleCache = scale;
+}
+
+        this.xSync.setOptions({
+            direction: GenericSync.DIRECTION_X,
+            scale: 1/scale
+        });
+
         this.spec = [];
 
         this.spec.push({
-            transform: FM.translate(0, this.storyPos.get(), 0),
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, storyPos, 0)),
             target: this.scrollview.render()
         });
         return this.spec;
@@ -73,7 +100,7 @@ define(function(require, exports, module) {
         var container = new ContainerSurface();
         this.scrollview = new Scrollview({
             direction: Utility.Direction.X,
-            defaultItemSize: [this.options.storyWidth, this.options.storyHeight],
+            defaultItemSize: [this.options.cardWidth, this.options.cardHeight],
             itemSpacing: this.options.gutter,
             drag: 0.005
         });
@@ -83,42 +110,54 @@ define(function(require, exports, module) {
             var story = new StoryView({
                 name: Data[i].name,
                 profilePic: Data[i].profilePic,
-                cardWidth: this.options.storyWidth,
-                cardHeight: this.options.storyHeight
+                cardWidth: this.options.cardWidth,
+                cardHeight: this.options.cardHeight
             });
 
-            story.pipe(this.scrollview);
-            story.pipe(this.sync);
+            // story.pipe(this.scrollview);
+            story.pipe(this.xSync);
+            story.pipe(this.ySync);
             stories.push(story);
         }
 
         this.scrollview.sequenceFrom(stories);
     };
 
-    var setupSync = function() {
-        this.storyPos = new Transitionable(window.innerHeight - this.options.storyHeight);
-        // this.storyPos = new Transitionable(0);
+    var createSyncs = function() {
+        this.yPos = new Transitionable(this.options.initCardPos);
+        this.xPos = new Transitionable(0);
 
-        this.sync = new GenericSync((function() {
-            return this.storyPos.get();
+        this.ySync = new GenericSync((function() {
+            return this.yPos.get();
         }).bind(this), {direction: GenericSync.DIRECTION_Y});
 
-        this.sync.on('start', (function() {
+        this.xSync = new GenericSync((function() {
+            return this.xPos.get();
+        }).bind(this), {direction: GenericSync.DIRECTION_X});
+    };
+
+    var setXListeners = function() {
+        this.xSync.pipe(this.scrollview);
+
+        this.xSync.on('update', (function(data) {
+            this.xPos.set(data.p);
+        }).bind(this));
+    };
+
+    var setYListeners = function() {
+        this.ySync.on('start', (function() {
 
         }).bind(this));
 
-        this.sync.on('update', (function(data) {
-            console.log(data.p);
-
-            this.storyPos.set(Math.max(0, data.p));
+        this.ySync.on('update', (function(data) {
+            this.yPos.set(Math.max(0, data.p));
         }).bind(this));
 
-        this.sync.on('end', (function(data) {
-            console.log(this.storyPos.get(), this.options.posThreshold);
+        this.ySync.on('end', (function(data) {
             var velocity = data.v.toFixed(2);
             console.log(velocity);
 
-            if(this.storyPos.get() < this.options.posThreshold) {
+            if(this.yPos.get() < this.options.posThreshold) {
                 if(velocity > this.options.velThreshold) {
                     this.slideDown(velocity);
                 } else {
@@ -129,8 +168,7 @@ define(function(require, exports, module) {
                     this.slideUp(Math.abs(velocity));
                 } else {
                     this.slideDown(velocity);
-                    console.log(this.storyPos.get(), velocity, this.options.velThreshold);
-
+                    console.log(this.yPos.get(), velocity, this.options.velThreshold);
                 }
             }
         }).bind(this));

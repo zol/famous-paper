@@ -36,7 +36,6 @@ define(function(require, exports, module) {
         }
 
         function createProfilePic() {
-            console.log(this.options)
             var size = this.options.profilePicSize;
 
             var surface = new Surface({
