@@ -22,7 +22,6 @@ define(function(require, exports, module) {
 
         createSyncs.call(this);
         createStories.call(this);
-        setXListeners.call(this);
         setYListeners.call(this);
 
         this.scale = new Interpolate({
@@ -37,7 +36,7 @@ define(function(require, exports, module) {
     StoriesView.prototype.constructor = StoriesView;
 
     StoriesView.DEFAULT_OPTIONS = {
-        velThreshold: 0.75,
+        velThreshold: 1,
         spring: {
             method: 'spring',
             period: 500,
@@ -53,6 +52,15 @@ define(function(require, exports, module) {
     StoriesView.DEFAULT_OPTIONS.initCardPos = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
     StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
 
+    StoriesView.DEFAULT_OPTIONS.scrollOpts = {
+        direction: Utility.Direction.X,
+        defaultItemSize: [StoriesView.DEFAULT_OPTIONS.cardWidth, StoriesView.DEFAULT_OPTIONS.cardHeight],
+        itemSpacing: 2,
+        margin: window.innerWidth*10,
+        pageSwitchSpeed: 0.1,
+        drag: 0.005
+    };
+
     StoriesView.prototype.slideUp = function(velocity) {
         console.log('slide up');
 
@@ -60,6 +68,9 @@ define(function(require, exports, module) {
         spring.velocity = velocity;
 
         this.yPos.set(0, spring);
+
+        this.options.scrollOpts.paginated = true;
+        this.scrollview.setOptions(this.options.scrollOpts);
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
@@ -69,6 +80,9 @@ define(function(require, exports, module) {
         spring.velocity = velocity;
 
         this.yPos.set(window.innerHeight - this.options.cardHeight, spring);
+
+        this.options.scrollOpts.paginated = false;
+        this.scrollview.setOptions(this.options.scrollOpts);
     };
 
 var scaleCache;
@@ -82,14 +96,19 @@ if(scaleCache !== scale) {
     scaleCache = scale;
 }
 
-        this.xSync.setOptions({
+        this.scrollview.sync.setOptions({
             direction: GenericSync.DIRECTION_X,
             scale: 1/scale
         });
 
+        this.options.scrollOpts.defaultItemSize[0] = this.options.cardWidth*scale;
+        this.options.scrollOpts.itemSpacing = 2 - (scale-1)*this.options.cardWidth;
+        this.scrollview.setOptions(this.options.scrollOpts);
+
         this.spec = [];
 
         this.spec.push({
+            origin: [0, 0],
             transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, storyPos, 0)),
             target: this.scrollview.render()
         });
@@ -98,12 +117,7 @@ if(scaleCache !== scale) {
 
     var createStories = function() {
         var container = new ContainerSurface();
-        this.scrollview = new Scrollview({
-            direction: Utility.Direction.X,
-            defaultItemSize: [this.options.cardWidth, this.options.cardHeight],
-            itemSpacing: this.options.gutter,
-            drag: 0.005
-        });
+        this.scrollview = new Scrollview(this.options.scrollOpts);
 
         var stories = [];
         for(var i = 0; i < Data.length; i++) {
@@ -114,8 +128,7 @@ if(scaleCache !== scale) {
                 cardHeight: this.options.cardHeight
             });
 
-            // story.pipe(this.scrollview);
-            story.pipe(this.xSync);
+            story.pipe(this.scrollview);
             story.pipe(this.ySync);
             stories.push(story);
         }
@@ -125,23 +138,10 @@ if(scaleCache !== scale) {
 
     var createSyncs = function() {
         this.yPos = new Transitionable(this.options.initCardPos);
-        this.xPos = new Transitionable(0);
 
         this.ySync = new GenericSync((function() {
             return this.yPos.get();
         }).bind(this), {direction: GenericSync.DIRECTION_Y});
-
-        this.xSync = new GenericSync((function() {
-            return this.xPos.get();
-        }).bind(this), {direction: GenericSync.DIRECTION_X});
-    };
-
-    var setXListeners = function() {
-        this.xSync.pipe(this.scrollview);
-
-        this.xSync.on('update', (function(data) {
-            this.xPos.set(data.p);
-        }).bind(this));
     };
 
     var setYListeners = function() {

@@ -13,8 +13,16 @@ define(function(require, exports, module) {
             profilePic: '../content/profile-pics/scuba.jpg'
         },
         {
+            name: 'Sarah Foster',
+            profilePic: '../content/profile-pics/sarah.jpg'
+        },
+        {
             name: 'Josh Hoover',
             profilePic: '../content/profile-pics/josh.jpg'
+        },
+        {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
         }
     ]
 });
