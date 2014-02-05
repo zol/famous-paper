@@ -125,7 +125,7 @@ if(upCache !== this.up) {
     upCache = this.up;
 }
         if(this.touch && this.xOffsetScale && !this.up) {
-            this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/2);
+            this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/4);
             // if(xOffsetCache !== this.xOffset) {
             //     console.log(scale, this.xOffset);
             //     xOffsetCache = this.xOffset
@@ -135,10 +135,15 @@ if(upCache !== this.up) {
 //     console.log()
 //     xStartCache = xStart;
 // }
+this.scrollview.setOutputFunction(undefined, function(offset) {
+    offset = offset+xPos-this.xOffset.get();
+    // console.log(offset)
+    return FM.translate(offset,0,0);
+}.bind(this))
 
         this.spec.push({
             origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(xPos-this.xOffset.get(), yPos, 0)),
+            transform: FM.move(FM.scale(scale, scale, 1), [0, yPos, 0]),
             target: this.scrollview.render()
         });
         return this.spec;
@@ -157,7 +162,7 @@ if(upCache !== this.up) {
                 cardHeight: this.options.cardHeight
             });
 
-            // story.pipe(this.scrollview);
+            story.pipe(this.scrollview);
             story.pipe(this.ySync);
             stories.push(story);
         }
@@ -220,7 +225,7 @@ if(upCache !== this.up) {
             }
             this.xOffset.set(0, spring);
             this.xPos.set(0, spring)
-                    // this.scrollview.goToNextPage();
+                    this.scrollview.goToNextPage();
         }).bind(this));
     };
 
