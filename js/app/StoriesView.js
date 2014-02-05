@@ -10,6 +10,8 @@ define(function(require, exports, module) {
     var Scrollview          = require('famous-views/Scrollview');
     var ContainerSurface    = require('famous/ContainerSurface');
     var Utility             = require('famous/Utility');
+    var EventArbiter        = require('famous/EventArbiter');
+    var Time                = require('famous-utils/Time');
 
     var StoryView           = require('./StoryView');
     var Data                = require('./Data');
@@ -23,6 +25,8 @@ define(function(require, exports, module) {
         createSyncs.call(this);
         createStories.call(this);
         setYListeners.call(this);
+
+        this.eventArbiter = new EventArbiter();
 
         this.scale = new Interpolate({
             input_1: 0,
@@ -58,19 +62,23 @@ define(function(require, exports, module) {
         itemSpacing: 2,
         margin: window.innerWidth*10,
         pageSwitchSpeed: 0.1,
+        pagePeriod: 1000,
+        pageDamp: 1,
         drag: 0.005
     };
 
     StoriesView.prototype.slideUp = function(velocity) {
-        console.log('slide up');
+        // console.log('slide up');
 
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.yPos.set(0, spring);
+        this.yPos.set(0, spring, function() {this.up = true;}.bind(this));
 
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
+
+        this.up = true;
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
@@ -79,20 +87,22 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.yPos.set(window.innerHeight - this.options.cardHeight, spring);
+        this.yPos.set(window.innerHeight - this.options.cardHeight, spring, function() {this.up = false;}.bind(this));
 
         this.options.scrollOpts.paginated = false;
         this.scrollview.setOptions(this.options.scrollOpts);
     };
 
 var scaleCache;
+var xOffsetCache;
+var upCache;
 
     StoriesView.prototype.render = function() {
-        var storyPos = this.yPos.get();
-        var scale = this.scale.calc(storyPos);
+        var xPos = this.xPos.get();
+        var yPos = this.yPos.get();
+        var scale = this.scale.calc(yPos);
 
 if(scaleCache !== scale) {
-    console.log()
     scaleCache = scale;
 }
 
@@ -107,9 +117,28 @@ if(scaleCache !== scale) {
 
         this.spec = [];
 
+        var xStart = this.xStart || 0;
+
+
+if(upCache !== this.up) {
+    console.log(this.up);
+    upCache = this.up;
+}
+        if(this.touch && this.xOffsetScale && !this.up) {
+            this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/2);
+            // if(xOffsetCache !== this.xOffset) {
+            //     console.log(scale, this.xOffset);
+            //     xOffsetCache = this.xOffset
+            // }
+        }
+// if(xStart !== xStartCache) {
+//     console.log()
+//     xStartCache = xStart;
+// }
+
         this.spec.push({
             origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, storyPos, 0)),
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(xPos-this.xOffset.get(), yPos, 0)),
             target: this.scrollview.render()
         });
         return this.spec;
@@ -128,7 +157,7 @@ if(scaleCache !== scale) {
                 cardHeight: this.options.cardHeight
             });
 
-            story.pipe(this.scrollview);
+            // story.pipe(this.scrollview);
             story.pipe(this.ySync);
             stories.push(story);
         }
@@ -137,25 +166,38 @@ if(scaleCache !== scale) {
     };
 
     var createSyncs = function() {
+        this.xPos = new Transitionable(0);
         this.yPos = new Transitionable(this.options.initCardPos);
+        this.xOffset = new Transitionable(0);
 
-        this.ySync = new GenericSync((function() {
-            return this.yPos.get();
-        }).bind(this), {direction: GenericSync.DIRECTION_Y});
+        this.ySync = new GenericSync(function() {
+            return [this.xPos.get(), this.yPos.get()];
+        }.bind(this));
     };
 
     var setYListeners = function() {
-        this.ySync.on('start', (function() {
-
-        }).bind(this));
+        this.ySync.on('start', function(data) {
+            this.touch = true;
+            console.log(this.scale.calc(this.yPos.get()))
+            this.xStart = data.pos[0]/this.scale.calc(this.yPos.get());
+            console.log(this.xStart)
+            this.xOffsetScale = new Interpolate({
+                input_1: this.xStart,
+                input_2: this.xStart/this.options.cardScale,
+                output_1: 0,
+                output_2: 1
+            });
+        }.bind(this));
 
         this.ySync.on('update', (function(data) {
-            this.yPos.set(Math.max(0, data.p));
+            this.yPos.set(Math.max(0, data.p[1]));
+            this.xPos.set(data.p[0]);
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
-            var velocity = data.v.toFixed(2);
-            console.log(velocity);
+            this.touch = false;
+            var velocity = data.v[1].toFixed(2);
+            // console.log(velocity);
 
             if(this.yPos.get() < this.options.posThreshold) {
                 if(velocity > this.options.velThreshold) {
@@ -168,9 +210,17 @@ if(scaleCache !== scale) {
                     this.slideUp(Math.abs(velocity));
                 } else {
                     this.slideDown(velocity);
-                    console.log(this.yPos.get(), velocity, this.options.velThreshold);
+                    // console.log(this.yPos.get(), velocity, this.options.velThreshold);
                 }
             }
+            var spring = {
+                method: 'spring',
+                period: 500,
+                dampingRatio: 1
+            }
+            this.xOffset.set(0, spring);
+            this.xPos.set(0, spring)
+                    // this.scrollview.goToNextPage();
         }).bind(this));
     };
 

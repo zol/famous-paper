@@ -8,8 +8,6 @@ define(function(require, exports, module) {
         this.slope = (y_2 - y_1)/(x_2 - x_1);
 
         this.intercept = y_2 - this.slope * x_2;
-        console.log(y_1)
-        console.log(this.slope, this.intercept);
     }
 
     Interpolate.prototype.calc = function(x) {
