@@ -47,6 +47,10 @@ define(function(require, exports, module) {
             period: 2000,
             dampingRatio: 1,
         },
+        curve: {
+            duration: 300,
+            curve: 'linear'
+        },
 
         cardWidth: 142,
         cardScale: 0.445,
@@ -56,7 +60,7 @@ define(function(require, exports, module) {
     StoriesView.DEFAULT_OPTIONS.cardHeight = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerHeight;
     StoriesView.DEFAULT_OPTIONS.initCardPos = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
     StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
-    StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight)/2;
+    // StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight)/2;
 
     StoriesView.DEFAULT_OPTIONS.scrollOpts = {
         direction: Utility.Direction.X,
@@ -75,7 +79,7 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.yPos.set(0, spring, function() {this.up = true;}.bind(this));
+        this.yPos.set(0, this.options.curve, function() {this.up = true;}.bind(this));
 
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
@@ -89,7 +93,7 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.yPos.set(window.innerHeight - this.options.cardHeight, spring, function() {this.up = false;}.bind(this));
+        this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {this.up = false;}.bind(this));
 
         this.options.scrollOpts.paginated = false;
         this.scrollview.setOptions(this.options.scrollOpts);
@@ -125,12 +129,12 @@ if(scaleCache !== scale) {
         if(this.touch && this.xOffsetScale) {
             this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
         } else {
-            this.xOffset.set(0);
+            // this.xOffset.set(0);
         }
 
         this.spec.push({
             origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(-this.xOffset.get(), yPos, 0)),
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(this.xPos.get()-this.xOffset.get(), yPos, 0)),
             target: this.scrollview.render()
         });
 
@@ -151,7 +155,7 @@ if(scaleCache !== scale) {
                 cardHeight: this.options.cardHeight
             });
 
-            story.pipe(this.scrollview);
+            // story.pipe(this.scrollview);
             story.pipe(this.ySync);
             stories.push(story);
         }
@@ -198,7 +202,7 @@ if(scaleCache !== scale) {
 
         this.ySync.on('update', (function(data) {
             this.yPos.set(Math.max(0, data.p[1]));
-            // this.xPos.set(data.p[0]);
+            this.xPos.set(data.p[0]);
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
@@ -227,8 +231,10 @@ if(scaleCache !== scale) {
             }
 
             if(this.up) {
-                this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
-                this.scrollview.setPosition((this.scrollview.getPosition() - this.options.cardWidth)/this.scale.calc(this.yPos.get()));
+                this.xOffset.set(this.snapTo, this.options.curve);
+                this.xPos.set(0, this.options.curve);
+                // this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
+                // this.scrollview.setPosition((this.scrollview.getPosition() - this.options.cardWidth)/this.scale.calc(this.yPos.get()));
                 // this.scrollview.goToNextPage();
             }
 
