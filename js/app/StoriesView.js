@@ -136,10 +136,12 @@ if(scaleCache !== scale) {
 
         var xStart = this.xStart || 0;
 
-        if(this.moveStories) {
+        if(this.moveUp) {
             this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
-        } else {
-            // this.xOffset.set(0);
+        }
+
+        if(this.moveDown) {
+            this.xOffset.set(0);
         }
 
         this.spec.push({
@@ -177,6 +179,8 @@ if(scaleCache !== scale) {
         var sequence = new ViewSequence(this.stories, 0, true);
 
         this.scrollview.sequenceFrom(this.stories);
+
+        this.down = true;
     };
 
     var createSyncs = function() {
@@ -190,25 +194,15 @@ if(scaleCache !== scale) {
     };
 
     var setYListeners = function() {
-
-
         this.ySync.on('start', function(data) {
+            var x = data.pos[0];
+            var scrollPos = this.scrollview.getPosition();
+            var scale = this.options.cardScale;
+            this.touch = true;
             this.firstTouch = true;
 
-            if(!this.up) {
-                var x = data.pos[0];
-                var scrollPos = this.scrollview.getPosition();
-
-                this.touch = true;
-                console.log(this.scale.calc(this.yPos.get()))
-                this.xStart = x/this.scale.calc(this.yPos.get());
-                console.log(this.xStart)
-                this.xOffsetScale = new Interpolate({
-                    input_1: this.xStart,
-                    input_2: this.xStart/this.options.cardScale,
-                    output_1: 0,
-                    output_2: 1
-                });
+            if(this.down) {
+                this.xStart = x;
 
                 if(x < this.options.cardWidth - scrollPos) {
                     this.snapPos = 0;
@@ -220,8 +214,19 @@ if(scaleCache !== scale) {
                     this.snapPos = (2*this.options.cardWidth)/this.options.cardScale;
                     this.snapNode = this.scrollview.getCurrentNode().getNext().getNext();
                 }
-                
             }
+
+            if(this.up) {
+                this.xStart = x*scale;
+            }
+console.log(this.xStart, x);
+
+            this.xOffsetScale = new Interpolate({
+                input_1: this.xStart,
+                input_2: this.xStart/scale,
+                output_1: 0,
+                output_2: 1
+            });
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
@@ -229,7 +234,8 @@ if(scaleCache !== scale) {
             if(this.firstTouch) {
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
                     this.storiesHandler.unpipe(this.scrollview);
-                    this.moveStories = true;
+                    if(this.down) this.moveUp = true;
+                    if(this.up) this.moveDown = true;
                     this.up = false;
                     this.down = false;
                 } else {
@@ -238,7 +244,7 @@ if(scaleCache !== scale) {
                 this.firstTouch = false;
             }
 
-            if(this.moveStories) {
+            if(this.moveUp || this.moveDown) {
                 this.yPos.set(Math.max(0, data.p[1]));
                 this.xPos.set(data.p[0]);
             }
@@ -253,7 +259,7 @@ if(scaleCache !== scale) {
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
 
-            if(this.moveStories) {
+            if(this.moveUp || this.moveDown) {
                 if(this.yPos.get() < this.options.posThreshold) {
                     if(velocity > this.options.velThreshold) {
                         this.slideDown(velocity);
@@ -267,10 +273,15 @@ if(scaleCache !== scale) {
                         this.slideDown(velocity);
                         // console.log(this.yPos.get(), velocity, this.options.velThreshold);
                     }
-                }        
-                this.xOffset.set(this.snapPos, this.options.curve);
-                this.xPos.set(0, this.options.curve);
-                this.moveStories = false;
+                }
+
+                if(this.moveUp) {
+                    this.xOffset.set(this.snapPos, this.options.curve);
+                    this.xPos.set(0, this.options.curve);
+                    this.moveUp = false;                
+                } else {
+                    this.moveDown = false;
+                }
             }
 
                 // this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
