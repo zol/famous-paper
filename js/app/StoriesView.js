@@ -44,8 +44,8 @@ define(function(require, exports, module) {
         velThreshold: 1,
         spring: {
             method: 'spring',
-            period: 500,
-            dampingRatio: 0.9,
+            period: 2000,
+            dampingRatio: 1,
         },
 
         cardWidth: 142,
@@ -56,14 +56,15 @@ define(function(require, exports, module) {
     StoriesView.DEFAULT_OPTIONS.cardHeight = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerHeight;
     StoriesView.DEFAULT_OPTIONS.initCardPos = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
     StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
+    StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight)/2;
 
     StoriesView.DEFAULT_OPTIONS.scrollOpts = {
         direction: Utility.Direction.X,
         defaultItemSize: [StoriesView.DEFAULT_OPTIONS.cardWidth, StoriesView.DEFAULT_OPTIONS.cardHeight],
         itemSpacing: 2,
         margin: window.innerWidth*10,
-        pageSwitchSpeed: Math.Infinity,
-        pagePeriod: 1000,
+        pageSwitchSpeed: 0.1,
+        pagePeriod: 300,
         pageDamp: 1,
         drag: 0.005
     };
@@ -112,16 +113,19 @@ if(scaleCache !== scale) {
             scale: 1/scale
         });
 
-        this.options.scrollOpts.defaultItemSize[0] = this.options.cardWidth*scale;
-        this.options.scrollOpts.itemSpacing = 2 - (scale-1)*this.options.cardWidth;
+        // this.options.scrollOpts.defaultItemSize[0] = this.options.cardWidth*scale;
+        // this.options.scrollOpts.itemSpacing = 2 - (scale-1)*this.options.cardWidth;
+        this.options.scrollOpts.clipSize = window.innerWidth/scale;
         this.scrollview.setOptions(this.options.scrollOpts);
 
         this.spec = [];
 
         var xStart = this.xStart || 0;
 
-        if(this.touch && this.xOffsetScale && !this.up) {
+        if(this.touch && this.xOffsetScale) {
             this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
+        } else {
+            this.xOffset.set(0);
         }
 
         this.spec.push({
@@ -130,7 +134,6 @@ if(scaleCache !== scale) {
             target: this.scrollview.render()
         });
 
-        console.log(this.scrollview.getPosition())
         return this.spec;
 
     };
@@ -224,9 +227,11 @@ if(scaleCache !== scale) {
             }
 
             if(this.up) {
-                this.xOffset.set(this.snapTo, spring);            
+                this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
+                this.scrollview.setPosition((this.scrollview.getPosition() - this.options.cardWidth)/this.scale.calc(this.yPos.get()));
+                // this.scrollview.goToNextPage();
             }
-                    // this.scrollview.goToNextPage();
+
         }).bind(this));
     };
 
