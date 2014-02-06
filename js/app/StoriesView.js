@@ -12,6 +12,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var EventArbiter        = require('famous/EventArbiter');
     var Time                = require('famous-utils/Time');
+    var ViewSequence        = require('famous/ViewSequence');
 
     var StoryView           = require('./StoryView');
     var Data                = require('./Data');
@@ -61,7 +62,7 @@ define(function(require, exports, module) {
         defaultItemSize: [StoriesView.DEFAULT_OPTIONS.cardWidth, StoriesView.DEFAULT_OPTIONS.cardHeight],
         itemSpacing: 2,
         margin: window.innerWidth*10,
-        pageSwitchSpeed: 0.1,
+        pageSwitchSpeed: Math.Infinity,
         pagePeriod: 1000,
         pageDamp: 1,
         drag: 0.005
@@ -119,29 +120,19 @@ if(scaleCache !== scale) {
 
         var xStart = this.xStart || 0;
 
-
-if(upCache !== this.up) {
-    console.log(this.up);
-    upCache = this.up;
-}
         if(this.touch && this.xOffsetScale && !this.up) {
-            this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/2);
-            // if(xOffsetCache !== this.xOffset) {
-            //     console.log(scale, this.xOffset);
-            //     xOffsetCache = this.xOffset
-            // }
+            this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
         }
-// if(xStart !== xStartCache) {
-//     console.log()
-//     xStartCache = xStart;
-// }
 
         this.spec.push({
             origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(xPos-this.xOffset.get(), yPos, 0)),
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(-this.xOffset.get(), yPos, 0)),
             target: this.scrollview.render()
         });
+
+        console.log(this.scrollview.getPosition())
         return this.spec;
+
     };
 
     var createStories = function() {
@@ -157,10 +148,12 @@ if(upCache !== this.up) {
                 cardHeight: this.options.cardHeight
             });
 
-            // story.pipe(this.scrollview);
+            story.pipe(this.scrollview);
             story.pipe(this.ySync);
             stories.push(story);
         }
+
+        var sequence = new ViewSequence(stories, 0, true);
 
         this.scrollview.sequenceFrom(stories);
     };
@@ -177,9 +170,12 @@ if(upCache !== this.up) {
 
     var setYListeners = function() {
         this.ySync.on('start', function(data) {
+            var x = data.pos[0];
+            var scrollPos = this.scrollview.getPosition();
+
             this.touch = true;
             console.log(this.scale.calc(this.yPos.get()))
-            this.xStart = data.pos[0]/this.scale.calc(this.yPos.get());
+            this.xStart = x/this.scale.calc(this.yPos.get());
             console.log(this.xStart)
             this.xOffsetScale = new Interpolate({
                 input_1: this.xStart,
@@ -187,11 +183,19 @@ if(upCache !== this.up) {
                 output_1: 0,
                 output_2: 1
             });
+
+            if(x < this.options.cardWidth - scrollPos) {
+                this.snapTo = 0;
+            } else if(x < 2*this.options.cardWidth - scrollPos) {
+                this.snapTo = (this.options.cardWidth+2)/this.options.cardScale;
+            } else {
+                this.snapTo = (2*this.options.cardWidth+4)/this.options.cardScale;
+            }
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
             this.yPos.set(Math.max(0, data.p[1]));
-            this.xPos.set(data.p[0]);
+            // this.xPos.set(data.p[0]);
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
@@ -218,8 +222,10 @@ if(upCache !== this.up) {
                 period: 500,
                 dampingRatio: 1
             }
-            this.xOffset.set(0, spring);
-            this.xPos.set(0, spring)
+
+            if(this.up) {
+                this.xOffset.set(this.snapTo, spring);            
+            }
                     // this.scrollview.goToNextPage();
         }).bind(this));
     };
