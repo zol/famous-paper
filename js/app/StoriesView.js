@@ -82,7 +82,7 @@ define(function(require, exports, module) {
 
         this.yPos.set(0, this.options.curve, function() {
             this.xOffset.set(0);
-            // this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
+            this.scrollview.sequenceFrom(this.snapNode);
             console.log('setttt');
             this.up = true;
         }.bind(this));
@@ -99,7 +99,11 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {this.up = false;}.bind(this));
+        this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {
+            this.xOffset.set(0);
+
+            this.down = true;
+        }.bind(this));
 
         this.options.scrollOpts.paginated = false;
         this.scrollview.setOptions(this.options.scrollOpts);
@@ -132,7 +136,7 @@ if(scaleCache !== scale) {
 
         var xStart = this.xStart || 0;
 
-        if(this.touch && this.xOffsetScale) {
+        if(this.moveStories) {
             this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
         } else {
             // this.xOffset.set(0);
@@ -207,11 +211,14 @@ if(scaleCache !== scale) {
                 });
 
                 if(x < this.options.cardWidth - scrollPos) {
-                    this.snapTo = 0;
+                    this.snapPos = 0;
+                    this.snapNode = this.scrollview.getCurrentNode();
                 } else if(x < 2*this.options.cardWidth - scrollPos) {
-                    this.snapTo = (this.options.cardWidth)/this.options.cardScale;
+                    this.snapPos = (this.options.cardWidth)/this.options.cardScale;
+                    this.snapNode = this.scrollview.getCurrentNode().getNext();
                 } else {
-                    this.snapTo = (2*this.options.cardWidth)/this.options.cardScale;
+                    this.snapPos = (2*this.options.cardWidth)/this.options.cardScale;
+                    this.snapNode = this.scrollview.getCurrentNode().getNext().getNext();
                 }
                 
             }
@@ -224,6 +231,7 @@ if(scaleCache !== scale) {
                     this.storiesHandler.unpipe(this.scrollview);
                     this.moveStories = true;
                     this.up = false;
+                    this.down = false;
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
                 }
@@ -232,7 +240,7 @@ if(scaleCache !== scale) {
 
             if(this.moveStories) {
                 this.yPos.set(Math.max(0, data.p[1]));
-                this.xPos.set(data.p[0]);            
+                this.xPos.set(data.p[0]);
             }
         }).bind(this));
 
@@ -241,33 +249,34 @@ if(scaleCache !== scale) {
             this.storiesHandler.pipe(this.scrollview);
 
             this.touch = false;
-            this.moveStories = false;
 
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
 
-            if(this.yPos.get() < this.options.posThreshold) {
-                if(velocity > this.options.velThreshold) {
-                    this.slideDown(velocity);
+            if(this.moveStories) {
+                if(this.yPos.get() < this.options.posThreshold) {
+                    if(velocity > this.options.velThreshold) {
+                        this.slideDown(velocity);
+                    } else {
+                        this.slideUp(Math.abs(velocity));
+                    }
                 } else {
-                    this.slideUp(Math.abs(velocity));
-                }
-            } else {
-                if(velocity < -this.options.velThreshold) {
-                    this.slideUp(Math.abs(velocity));
-                } else {
-                    this.slideDown(velocity);
-                    // console.log(this.yPos.get(), velocity, this.options.velThreshold);
-                }
+                    if(velocity < -this.options.velThreshold) {
+                        this.slideUp(Math.abs(velocity));
+                    } else {
+                        this.slideDown(velocity);
+                        // console.log(this.yPos.get(), velocity, this.options.velThreshold);
+                    }
+                }        
+                this.xOffset.set(this.snapPos, this.options.curve);
+                this.xPos.set(0, this.options.curve);
+                this.moveStories = false;
             }
 
-            if(!this.up) {
-                this.xOffset.set(this.snapTo, this.options.curve);
-                this.xPos.set(0, this.options.curve);
                 // this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
                 // this.scrollview.setPosition((this.scrollview.getPosition() - this.options.cardWidth)/this.scale.calc(this.yPos.get()));
                 // this.scrollview.goToNextPage();
-            }
+            
 
         }).bind(this));
     };
