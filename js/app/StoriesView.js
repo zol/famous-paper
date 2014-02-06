@@ -82,7 +82,7 @@ define(function(require, exports, module) {
 
         this.yPos.set(0, this.options.curve, function() {
             this.xOffset.set(0);
-            this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
+            // this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
             console.log('setttt');
             this.up = true;
         }.bind(this));
@@ -209,9 +209,9 @@ if(scaleCache !== scale) {
                 if(x < this.options.cardWidth - scrollPos) {
                     this.snapTo = 0;
                 } else if(x < 2*this.options.cardWidth - scrollPos) {
-                    this.snapTo = (this.options.cardWidth+2)/this.options.cardScale;
+                    this.snapTo = (this.options.cardWidth)/this.options.cardScale;
                 } else {
-                    this.snapTo = (2*this.options.cardWidth+4)/this.options.cardScale;
+                    this.snapTo = (2*this.options.cardWidth)/this.options.cardScale;
                 }
                 
             }
@@ -222,13 +222,18 @@ if(scaleCache !== scale) {
             if(this.firstTouch) {
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
                     this.storiesHandler.unpipe(this.scrollview);
+                    this.moveStories = true;
+                    this.up = false;
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
                 }
                 this.firstTouch = false;
             }
-            this.yPos.set(Math.max(0, data.p[1]));
-            this.xPos.set(data.p[0]);
+
+            if(this.moveStories) {
+                this.yPos.set(Math.max(0, data.p[1]));
+                this.xPos.set(data.p[0]);            
+            }
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
@@ -236,6 +241,8 @@ if(scaleCache !== scale) {
             this.storiesHandler.pipe(this.scrollview);
 
             this.touch = false;
+            this.moveStories = false;
+
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
 
@@ -252,11 +259,6 @@ if(scaleCache !== scale) {
                     this.slideDown(velocity);
                     // console.log(this.yPos.get(), velocity, this.options.velThreshold);
                 }
-            }
-            var spring = {
-                method: 'spring',
-                period: 500,
-                dampingRatio: 1
             }
 
             if(!this.up) {
