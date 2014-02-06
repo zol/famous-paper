@@ -115,6 +115,7 @@ if(scaleCache !== this.scale) {
 
 
 this.scrollview.setOutputFunction(undefined, function(offset) {
+    console.log(offset)
     this.xOffset = this.xOffset || 0;
     return FM.move(FM.scale(this.scale, this.scale, 1), [offset + this.xOffset * Utils.map(this.scale, 1, 1/this.options.cardScale, 0, 1), 0, 0]);
 }.bind(this))
