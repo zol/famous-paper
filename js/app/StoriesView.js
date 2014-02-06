@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     var EventArbiter        = require('famous/EventArbiter');
     var Time                = require('famous-utils/Time');
     var ViewSequence        = require('famous/ViewSequence');
+    var EventHandler        = require('famous/EventHandler');
 
     var StoryView           = require('./StoryView');
     var Data                = require('./Data');
@@ -49,7 +50,7 @@ define(function(require, exports, module) {
         },
         curve: {
             duration: 300,
-            curve: 'linear'
+            curve: 'easeOut'
         },
 
         cardWidth: 142,
@@ -79,12 +80,17 @@ define(function(require, exports, module) {
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        this.yPos.set(0, this.options.curve, function() {this.up = true;}.bind(this));
+        this.yPos.set(0, this.options.curve, function() {
+            this.xOffset.set(0);
+            this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
+            console.log('setttt');
+            this.up = true;
+        }.bind(this));
 
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
 
-        this.up = true;
+        // this.up = true;
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
@@ -143,10 +149,12 @@ if(scaleCache !== scale) {
     };
 
     var createStories = function() {
+        this.storiesHandler = new EventHandler();
+
         var container = new ContainerSurface();
         this.scrollview = new Scrollview(this.options.scrollOpts);
 
-        var stories = [];
+        this.stories = [];
         for(var i = 0; i < Data.length; i++) {
             var story = new StoryView({
                 name: Data[i].name,
@@ -155,14 +163,16 @@ if(scaleCache !== scale) {
                 cardHeight: this.options.cardHeight
             });
 
-            // story.pipe(this.scrollview);
-            story.pipe(this.ySync);
-            stories.push(story);
+            story.pipe(this.storiesHandler);
+            this.stories.push(story);
         }
 
-        var sequence = new ViewSequence(stories, 0, true);
+        this.storiesHandler.pipe(this.scrollview);
+        this.storiesHandler.pipe(this.ySync);
 
-        this.scrollview.sequenceFrom(stories);
+        var sequence = new ViewSequence(this.stories, 0, true);
+
+        this.scrollview.sequenceFrom(this.stories);
     };
 
     var createSyncs = function() {
@@ -176,36 +186,55 @@ if(scaleCache !== scale) {
     };
 
     var setYListeners = function() {
+
+
         this.ySync.on('start', function(data) {
-            var x = data.pos[0];
-            var scrollPos = this.scrollview.getPosition();
+            this.firstTouch = true;
 
-            this.touch = true;
-            console.log(this.scale.calc(this.yPos.get()))
-            this.xStart = x/this.scale.calc(this.yPos.get());
-            console.log(this.xStart)
-            this.xOffsetScale = new Interpolate({
-                input_1: this.xStart,
-                input_2: this.xStart/this.options.cardScale,
-                output_1: 0,
-                output_2: 1
-            });
+            if(!this.up) {
+                var x = data.pos[0];
+                var scrollPos = this.scrollview.getPosition();
 
-            if(x < this.options.cardWidth - scrollPos) {
-                this.snapTo = 0;
-            } else if(x < 2*this.options.cardWidth - scrollPos) {
-                this.snapTo = (this.options.cardWidth+2)/this.options.cardScale;
-            } else {
-                this.snapTo = (2*this.options.cardWidth+4)/this.options.cardScale;
+                this.touch = true;
+                console.log(this.scale.calc(this.yPos.get()))
+                this.xStart = x/this.scale.calc(this.yPos.get());
+                console.log(this.xStart)
+                this.xOffsetScale = new Interpolate({
+                    input_1: this.xStart,
+                    input_2: this.xStart/this.options.cardScale,
+                    output_1: 0,
+                    output_2: 1
+                });
+
+                if(x < this.options.cardWidth - scrollPos) {
+                    this.snapTo = 0;
+                } else if(x < 2*this.options.cardWidth - scrollPos) {
+                    this.snapTo = (this.options.cardWidth+2)/this.options.cardScale;
+                } else {
+                    this.snapTo = (2*this.options.cardWidth+4)/this.options.cardScale;
+                }
+                
             }
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
+            console.log(this.firstTouch)
+            if(this.firstTouch) {
+                if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
+                    this.storiesHandler.unpipe(this.scrollview);
+                } else {
+                    this.storiesHandler.unpipe(this.ySync);
+                }
+                this.firstTouch = false;
+            }
             this.yPos.set(Math.max(0, data.p[1]));
             this.xPos.set(data.p[0]);
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
+            this.storiesHandler.pipe(this.ySync);
+            this.storiesHandler.pipe(this.scrollview);
+
             this.touch = false;
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
@@ -230,7 +259,7 @@ if(scaleCache !== scale) {
                 dampingRatio: 1
             }
 
-            if(this.up) {
+            if(!this.up) {
                 this.xOffset.set(this.snapTo, this.options.curve);
                 this.xPos.set(0, this.options.curve);
                 // this.scrollview.sequenceFrom(this.scrollview.getCurrentNode().getNext());
