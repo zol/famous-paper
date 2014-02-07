@@ -64,7 +64,8 @@ define(function(require, exports, module) {
         profilePic: null,
         profilePicSize: 40,
         cardWidth: null,
-        cardHeight: null
+        cardHeight: null,
+        index: null
     };
 
     StoryView.prototype.getSize = function() {
@@ -72,9 +73,13 @@ define(function(require, exports, module) {
     };
 
     StoryView.prototype.getPosition = function() {
-        console.log(this.options.name, Utils.getSurfacePosition(this.card));
+        // console.log(this.options.name, Utils.getSurfacePosition(this.card));
         return Utils.getSurfacePosition(this.card);
-    }
+    };
+
+    StoryView.prototype.getIndex = function() {
+        return this.options.index;
+    };
 
     // StoryView.prototype.render = function() {
     //     this.spec = [];

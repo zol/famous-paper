@@ -44,7 +44,7 @@ self = this;
     StoriesView.prototype.constructor = StoriesView;
 
     StoriesView.DEFAULT_OPTIONS = {
-        velThreshold: 1,
+        velThreshold: 0.5,
         spring: {
             method: 'spring',
             period: 2000,
@@ -88,7 +88,8 @@ self = this;
                 name: Data[i].name,
                 profilePic: Data[i].profilePic,
                 cardWidth: this.options.cardWidth,
-                cardHeight: this.options.cardHeight
+                cardHeight: this.options.cardHeight,
+                index: i
             });
 
             story.pipe(this.storiesHandler);
@@ -97,6 +98,7 @@ self = this;
             story.on('touchstart', function(story) {
                 if(this.state === 'up') this.initX = 0;
                 else this.initX = story.getPosition()[0];
+                this.initIndex = story.getIndex();
             }.bind(this, story));
         }
 
@@ -107,7 +109,6 @@ self = this;
 
         this.scrollview.sequenceFrom(this.stories);
 
-        this.down = true;
         this.state = 'down';
     };
 
@@ -124,38 +125,33 @@ self = this;
     var setYListeners = function() {
         this.ySync.on('start', function(data) {
             var x = data.pos[0];
-            var scrollPos = this.scrollview.getPosition();
-            var scale = this.options.cardScale;
             this.touch = true;
-            this.firstTouch = true;
 
-            if(this.down) {
+            if(this.state === 'down') {
                 this.xStart = x;
-
-                if(x < this.options.cardWidth - scrollPos) {
-                    this.snapPos = 0;
-                    this.snapNode = this.scrollview.getCurrentNode();
-                } else if(x < 2*this.options.cardWidth - scrollPos) {
-                    this.snapPos = (this.options.cardWidth)/this.options.cardScale;
-                    this.snapNode = this.scrollview.getCurrentNode().getNext();
-                } else {
-                    this.snapPos = (2*this.options.cardWidth)/this.options.cardScale;
-                    this.snapNode = this.scrollview.getCurrentNode().getNext().getNext();
-                }
-            }
-
-            if(this.up) {
-                this.xStart = x*scale;
+                this.snapNode = findNode.call(this);
             }
 
             this.xOffsetScale = new Interpolate({
                 input_1: this.xStart,
-                input_2: this.xStart/scale,
+                input_2: this.xStart/this.options.cardScale,
                 output_1: 0,
                 output_2: 1
             });
 
             this.direction = undefined;
+
+            function findNode() {
+                var node = this.scrollview.node;
+                while(node.index < this.initIndex) {
+                    node = node._next;
+                }
+
+                // console.log(node.index)
+                // console.log(node.array[node.index].options.name);
+                return node;
+            }
+
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
@@ -164,17 +160,11 @@ self = this;
                     this.storiesHandler.unpipe(this.scrollview);
                     this.direction = 'y';
 
-                    if(this.state !== 'up') {
-                        console.log('sequence')
+                    if(this.state === 'down') {
+                        // console.log('sequence')
                         this.scrollview.sequenceFrom(this.snapNode);
                         this.xPos.set(this.initX);                        
                     }
-
-                    if(this.down) this.moveUp = true;
-                    if(this.up) this.moveDown = true;
-
-                    this.up = false;
-                    this.down = false;
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
                     this.direction = 'x';
@@ -200,19 +190,21 @@ self = this;
 
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
-
-            if(this.yPos.get() < this.options.posThreshold) {
+            if(this.state === 'up') {
+                console.log(this.state, velocity)
                 if(velocity > this.options.velThreshold) {
+                    console.log(this.state, velocity);
                     this.slideDown(velocity);
                 } else {
                     this.slideUp(Math.abs(velocity));
                 }
-            } else {
+            }
+            if(this.state === 'down') {
+                console.log(this.state, velocity)
                 if(velocity < -this.options.velThreshold) {
                     this.slideUp(Math.abs(velocity));
                 } else {
                     this.slideDown(velocity);
-                    // console.log(this.yPos.get(), velocity, this.options.velThreshold);
                 }
             }
 
@@ -223,49 +215,25 @@ self = this;
     StoriesView.prototype.slideUp = function(velocity) {
         console.log('slide up');
 
-        var spring = this.options.spring;
-        spring.velocity = velocity;
-
         this.xPos.set(0, this.options.curve);
-        // if(this.startState === 'down') {
-        //     this.xOffset.set(this.snapPos, this.options.curve);
-        //     this.xPos.set(0, this.options.curve);
-        // } else {
-        //     this.xOffset.set(0, this.options.curve);
-        //     this.xPos.set(0, this.options.curve);
-        // }
-
         this.yPos.set(0, this.options.curve, function() {
-            // if(this.startState === 'down') {
-            //     this.scrollview.sequenceFrom(this.snapNode);
-            // }
-            // this.xOffset.set(0);
-            // this.xPos.set(0);
-
-            // this.up = true;
-            // this.startState = 'up';
             this.state = 'up';
+            console.log(this.state)
+            this.options.scrollOpts.paginated = true;
+            this.scrollview.setOptions(this.options.scrollOpts);
         }.bind(this));
 
-        this.options.scrollOpts.paginated = true;
-        this.scrollview.setOptions(this.options.scrollOpts);
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
-        // console.log('slide down');
-
-        // var spring = this.options.spring;
-        // spring.velocity = velocity;
+        console.log('slide down');
 
         // this.xOffset.set(0, this.options.curve);
-        // this.xPos.set(0, this.options.curve);
+        this.xPos.set(0, this.options.curve);
 
-        // this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {
-        //     this.xOffset.set(0);
-
-        //     this.down = true;
-        //     this.startState = 'down';
-        // }.bind(this));
+        this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {
+            this.state = 'down';
+        }.bind(this));
 
         // this.options.scrollOpts.paginated = false;
         // this.scrollview.setOptions(this.options.scrollOpts);
@@ -285,7 +253,7 @@ self = this;
         this.scrollview.setOptions(this.options.scrollOpts);
 
         this.spec = [];
-
+console.log(this.state)
         var xStart = this.xStart || 0;
 
         this.spec.push({
