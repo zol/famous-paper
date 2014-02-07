@@ -270,6 +270,9 @@ console.log(this.snapPos);
 
         if(this.moveUp) {
             this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
+            this.scrollview.setOutputFunction(undefined, function(offset) {
+                return FM.translate(offset + this.xPos.get()*this.options.cardScale-this.xOffset.get()*this.options.cardScale, 0, 0);
+            }.bind(this));
         }
 
         if(this.moveDown) {
@@ -278,7 +281,7 @@ console.log(this.snapPos);
 
         this.spec.push({
             origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(this.xPos.get()-this.xOffset.get(), yPos, 0)),
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, yPos, 0)),
             target: this.scrollview.render()
         });
 
