@@ -66,6 +66,10 @@ define(function(require, exports, module) {
         cardHeight: null
     };
 
+    StoryView.prototype.getSize = function() {
+        return [this.options.cardWidth, this.options.cardHeight];
+    };
+
     // StoryView.prototype.render = function() {
     //     this.spec = [];
 
