@@ -136,7 +136,7 @@ define(function(require, exports, module) {
                     this.snapNode = this.scrollview.getCurrentNode().getNext().getNext();
                 }
             }
-console.log(this.snapPos);
+
             if(this.up) {
                 this.xStart = x*scale;
             }
@@ -147,24 +147,29 @@ console.log(this.snapPos);
                 output_1: 0,
                 output_2: 1
             });
+
+            this.direction = undefined;
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
-            console.log(this.firstTouch)
-            if(this.firstTouch || this.moveUp || this.moveDown) {
+            if(!this.direction) {
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
                     this.storiesHandler.unpipe(this.scrollview);
-                    this.yPos.set(Math.max(0, data.p[1]));
-                    this.xPos.set(data.p[0]);
+                    this.direction = 'y';
+
                     if(this.down) this.moveUp = true;
                     if(this.up) this.moveDown = true;
+
                     this.up = false;
                     this.down = false;
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
+                    this.direction = 'x';
                 }
-                this.firstTouch = false;
             }
+
+            this.yPos.set(Math.max(0, data.p[1]));
+            this.xPos.set(data.p[0]);
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
