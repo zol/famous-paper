@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     var Scrollview          = require('famous-views/Scrollview');
     var ContainerSurface    = require('famous/ContainerSurface');
     var Utility             = require('famous/Utility');
+    var Utils               = require('famous-utils/Utils');
 
     // Transitionable.registerMethod('spring', SpringTransition);
 
@@ -21,7 +22,7 @@ define(function(require, exports, module) {
         createProfilePic.call(this);
 
         function createCard() {
-            var surface = new Surface({
+            this.card = new Surface({
                 size: [this.options.cardWidth, this.options.cardHeight],
                 properties: {
                     borderRadius: '2px',
@@ -31,8 +32,8 @@ define(function(require, exports, module) {
 
             var modifier = new Modifier();
 
-            this._add(modifier).link(surface);
-            surface.pipe(this.eventOutput);
+            this._add(modifier).link(this.card);
+            this.card.pipe(this.eventOutput);
         }
 
         function createProfilePic() {
@@ -69,6 +70,11 @@ define(function(require, exports, module) {
     StoryView.prototype.getSize = function() {
         return [this.options.cardWidth, this.options.cardHeight];
     };
+
+    StoryView.prototype.getPosition = function() {
+        console.log(this.options.name, Utils.getSurfacePosition(this.card));
+        return Utils.getSurfacePosition(this.card);
+    }
 
     // StoryView.prototype.render = function() {
     //     this.spec = [];

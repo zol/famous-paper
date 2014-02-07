@@ -18,7 +18,7 @@ define(function(require, exports, module) {
     var StoryView           = require('./StoryView');
     var Data                = require('./Data');
     var Interpolate         = require('./utils/Interpolate');
-
+    window.matrix = FM;
     Transitionable.registerMethod('spring', SpringTransition);
 
     function StoriesView() {
@@ -32,10 +32,12 @@ define(function(require, exports, module) {
 
         this.scale = new Interpolate({
             input_1: 0,
-            input_2: this.options.initCardPos,
+            input_2: this.options.initY,
             output_1: 1/this.options.cardScale,
             output_2: 1
         });
+
+self = this;
     }
 
     StoriesView.prototype = Object.create(View.prototype);
@@ -59,7 +61,7 @@ define(function(require, exports, module) {
         margin: 20
     };
     StoriesView.DEFAULT_OPTIONS.cardHeight = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerHeight;
-    StoriesView.DEFAULT_OPTIONS.initCardPos = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
+    StoriesView.DEFAULT_OPTIONS.initY = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
     StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
     // StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight)/2;
 
@@ -91,6 +93,11 @@ define(function(require, exports, module) {
 
             story.pipe(this.storiesHandler);
             this.stories.push(story);
+
+            story.on('touchstart', function(story) {
+                if(this.state === 'up') this.initX = 0;
+                else this.initX = story.getPosition()[0];
+            }.bind(this, story));
         }
 
         this.storiesHandler.pipe(this.scrollview);
@@ -101,12 +108,12 @@ define(function(require, exports, module) {
         this.scrollview.sequenceFrom(this.stories);
 
         this.down = true;
-        this.startState = 'down';
+        this.state = 'down';
     };
 
     var createSyncs = function() {
         this.xPos = new Transitionable(0);
-        this.yPos = new Transitionable(this.options.initCardPos);
+        this.yPos = new Transitionable(this.options.initY);
         this.xOffset = new Transitionable(0);
 
         this.ySync = new GenericSync(function() {
@@ -157,6 +164,12 @@ define(function(require, exports, module) {
                     this.storiesHandler.unpipe(this.scrollview);
                     this.direction = 'y';
 
+                    if(this.state !== 'up') {
+                        console.log('sequence')
+                        this.scrollview.sequenceFrom(this.snapNode);
+                        this.xPos.set(this.initX);                        
+                    }
+
                     if(this.down) this.moveUp = true;
                     if(this.up) this.moveDown = true;
 
@@ -168,8 +181,15 @@ define(function(require, exports, module) {
                 }
             }
 
+            if(this.direction === 'y') {
+                this.xPos.set(this.initX += data.d[0]);
+            }
+
+            if(this.direction === 'x' && this.state === 'up') {
+                // this.xPos.set(0);
+            }
+
             this.yPos.set(Math.max(0, data.p[1]));
-            this.xPos.set(data.p[0]);
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
@@ -181,55 +201,50 @@ define(function(require, exports, module) {
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
 
-            if(this.moveUp || this.moveDown) {
-                if(this.yPos.get() < this.options.posThreshold) {
-                    if(velocity > this.options.velThreshold) {
-                        this.slideDown(velocity);
-                    } else {
-                        this.slideUp(Math.abs(velocity));
-                    }
+            if(this.yPos.get() < this.options.posThreshold) {
+                if(velocity > this.options.velThreshold) {
+                    this.slideDown(velocity);
                 } else {
-                    if(velocity < -this.options.velThreshold) {
-                        this.slideUp(Math.abs(velocity));
-                    } else {
-                        this.slideDown(velocity);
-                        // console.log(this.yPos.get(), velocity, this.options.velThreshold);
-                    }
+                    this.slideUp(Math.abs(velocity));
                 }
-
-                if(this.moveUp) {
-                    this.moveUp = false;                
+            } else {
+                if(velocity < -this.options.velThreshold) {
+                    this.slideUp(Math.abs(velocity));
                 } else {
-                    this.moveDown = false;
+                    this.slideDown(velocity);
+                    // console.log(this.yPos.get(), velocity, this.options.velThreshold);
                 }
             }
+
         }).bind(this));
     };
 
 
     StoriesView.prototype.slideUp = function(velocity) {
-        // console.log('slide up');
+        console.log('slide up');
 
         var spring = this.options.spring;
         spring.velocity = velocity;
 
-        if(this.startState === 'down') {
-            this.xOffset.set(this.snapPos, this.options.curve);
-            this.xPos.set(0, this.options.curve);
-        } else {
-            this.xOffset.set(0, this.options.curve);
-            this.xPos.set(0, this.options.curve);
-        }
+        this.xPos.set(0, this.options.curve);
+        // if(this.startState === 'down') {
+        //     this.xOffset.set(this.snapPos, this.options.curve);
+        //     this.xPos.set(0, this.options.curve);
+        // } else {
+        //     this.xOffset.set(0, this.options.curve);
+        //     this.xPos.set(0, this.options.curve);
+        // }
 
         this.yPos.set(0, this.options.curve, function() {
-            if(this.startState === 'down') {
-                this.scrollview.sequenceFrom(this.snapNode);
-            }
-            this.xOffset.set(0);
-            this.xPos.set(0);
+            // if(this.startState === 'down') {
+            //     this.scrollview.sequenceFrom(this.snapNode);
+            // }
+            // this.xOffset.set(0);
+            // this.xPos.set(0);
 
-            this.up = true;
-            this.startState = 'up';
+            // this.up = true;
+            // this.startState = 'up';
+            this.state = 'up';
         }.bind(this));
 
         this.options.scrollOpts.paginated = true;
@@ -237,23 +252,23 @@ define(function(require, exports, module) {
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
-        console.log('slide down');
+        // console.log('slide down');
 
-        var spring = this.options.spring;
-        spring.velocity = velocity;
+        // var spring = this.options.spring;
+        // spring.velocity = velocity;
 
-        this.xOffset.set(0, this.options.curve);
-        this.xPos.set(0, this.options.curve);
+        // this.xOffset.set(0, this.options.curve);
+        // this.xPos.set(0, this.options.curve);
 
-        this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {
-            this.xOffset.set(0);
+        // this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {
+        //     this.xOffset.set(0);
 
-            this.down = true;
-            this.startState = 'down';
-        }.bind(this));
+        //     this.down = true;
+        //     this.startState = 'down';
+        // }.bind(this));
 
-        this.options.scrollOpts.paginated = false;
-        this.scrollview.setOptions(this.options.scrollOpts);
+        // this.options.scrollOpts.paginated = false;
+        // this.scrollview.setOptions(this.options.scrollOpts);
     };
 
     StoriesView.prototype.render = function() {
@@ -273,20 +288,9 @@ define(function(require, exports, module) {
 
         var xStart = this.xStart || 0;
 
-        if(this.moveUp) {
-            this.xOffset.set(this.xOffsetScale.calc(xStart*scale)*xStart/this.options.cardScale/1.8);
-            this.scrollview.setOutputFunction(undefined, function(offset) {
-                return FM.translate(offset + this.xPos.get()*this.options.cardScale-this.xOffset.get()*this.options.cardScale, 0, 0);
-            }.bind(this));
-        }
-
-        if(this.moveDown) {
-            this.xOffset.set(0);
-        }
-
         this.spec.push({
             origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, yPos, 0)),
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(xPos, yPos, 0)),
             target: this.scrollview.render()
         });
 
