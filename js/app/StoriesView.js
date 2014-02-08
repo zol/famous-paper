@@ -51,7 +51,7 @@ self = this;
             dampingRatio: 1,
         },
         curve: {
-            duration: 400,
+            duration: 250,
             curve: 'easeOut'
         },
 
@@ -202,8 +202,7 @@ self = this;
                 } else {
                     this.slideUp(Math.abs(velocity));
                 }
-            }
-            if(this.state === 'down') {
+            } else if(this.state === 'down') {
                 console.log(this.state, velocity)
                 if(velocity < -this.options.velThreshold) {
                     this.slideUp(Math.abs(velocity));
@@ -235,7 +234,7 @@ self = this;
         // this.xOffset.set(0, this.options.curve);
         this.xPos.set(0, this.options.curve);
 
-        this.yPos.set(window.innerHeight - this.options.cardHeight, this.options.curve, function() {
+        this.yPos.set(this.options.initY, this.options.curve, function() {
             this.state = 'down';
         }.bind(this));
 
