@@ -73,7 +73,7 @@ self = this;
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
-        drag: 0.005
+        drag: 0.01
     };
 
     var createStories = function() {
@@ -115,11 +115,10 @@ self = this;
     var createSyncs = function() {
         this.xPos = new Transitionable(0);
         this.yPos = new Transitionable(this.options.initY);
-        this.xOffset = new Transitionable(0);
 
         this.ySync = new GenericSync(function() {
             return [this.xPos.get(), this.yPos.get()];
-        }.bind(this));
+        }.bind(this), {scale: 2.5});
     };
 
     var setYListeners = function() {
@@ -132,13 +131,6 @@ self = this;
                 this.snapNode = findNode.call(this);
             }
 
-            this.xOffsetScale = new Interpolate({
-                input_1: this.xStart,
-                input_2: this.xStart/this.options.cardScale,
-                output_1: 0,
-                output_2: 1
-            });
-
             this.direction = undefined;
 
             function findNode() {
@@ -147,8 +139,6 @@ self = this;
                     node = node._next;
                 }
 
-                // console.log(node.index)
-                // console.log(node.array[node.index].options.name);
                 return node;
             }
 
@@ -161,9 +151,11 @@ self = this;
                     this.direction = 'y';
 
                     if(this.state === 'down') {
-                        // console.log('sequence')
+                        console.log('sequence,', this.stories[this.snapNode.index].options.name, this.initX);
+                        // console.log(this.snapNode.index);
                         this.scrollview.sequenceFrom(this.snapNode);
-                        this.xPos.set(this.initX);                        
+                        console.log(this.scrollview.node.index)
+                        this.xPos.set(this.initX);
                     }
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
@@ -194,7 +186,7 @@ self = this;
 
             var velocity = data.v[1].toFixed(2);
             // console.log(velocity);
-            if(this.state === 'up') {
+            if(this.yPos.get() < this.options.posThreshold) {
                 console.log(this.state, velocity)
                 if(velocity > this.options.velThreshold) {
                     console.log(this.state, velocity);
@@ -202,8 +194,7 @@ self = this;
                 } else {
                     this.slideUp(Math.abs(velocity));
                 }
-            } else if(this.state === 'down') {
-                console.log(this.state, velocity)
+            } else {
                 if(velocity < -this.options.velThreshold) {
                     this.slideUp(Math.abs(velocity));
                 } else {
@@ -216,8 +207,6 @@ self = this;
 
 
     StoriesView.prototype.slideUp = function(velocity) {
-        console.log('slide up');
-
         this.options.scrollOpts.paginated = true;
         this.xPos.set(0, this.options.curve);
         this.yPos.set(0, this.options.curve, function() {
@@ -229,16 +218,12 @@ self = this;
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
-        console.log('slide down');
-
-        // this.xOffset.set(0, this.options.curve);
+        this.options.scrollOpts.paginated = false;
         this.xPos.set(0, this.options.curve);
-
         this.yPos.set(this.options.initY, this.options.curve, function() {
             this.state = 'down';
         }.bind(this));
 
-        this.options.scrollOpts.paginated = false;
         // this.scrollview.setOptions(this.options.scrollOpts);
     };
 
@@ -256,7 +241,7 @@ self = this;
         this.scrollview.setOptions(this.options.scrollOpts);
 
         this.spec = [];
-console.log(this.state)
+
         var xStart = this.xStart || 0;
 
         this.spec.push({
