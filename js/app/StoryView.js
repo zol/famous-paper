@@ -23,36 +23,28 @@ define(function(require, exports, module) {
 
         function createCard() {
             this.card = new Surface({
-                size: [this.options.cardWidth, this.options.cardHeight],
+                size: [undefined, undefined],
                 properties: {
-                    borderRadius: '2px',
+                    borderRadius: '5px',
                     backgroundColor: 'white'
                 }
             });
 
-            var modifier = new Modifier();
-
-            this._add(modifier).link(this.card);
             this.card.pipe(this.eventOutput);
         }
 
         function createProfilePic() {
             var size = this.options.profilePicSize;
 
-            var surface = new Surface({
-                size: [size, size],
+            this.pPic = new Surface({
+                size: [120, 120],
                 content: '<img width="' + size + '" src="' + this.options.profilePic + '" />',
                 properties: {
                     backgroundColor: 'blue'
                 }
             });
 
-            var modifier = new Modifier({
-                transform: FM.translate(8, 8, 0)
-            });
-
-            this._add(modifier).link(surface);
-            surface.pipe(this.eventOutput);
+            this.pPic.pipe(this.eventOutput);
         };
     }
 
@@ -62,30 +54,30 @@ define(function(require, exports, module) {
     StoryView.DEFAULT_OPTIONS = {
         name: null,
         profilePic: null,
-        profilePicSize: 40,
-        cardWidth: null,
-        cardHeight: null,
-        index: null
+        profilePicSize: 120,
+        scale: null
     };
 
     StoryView.prototype.getSize = function() {
-        return [this.options.cardWidth, this.options.cardHeight];
     };
 
-    StoryView.prototype.getPosition = function() {
-        console.log(this.options.name, Utils.getSurfacePosition(this.card));
-        return Utils.getSurfacePosition(this.card);
+    StoryView.prototype.setProgress = function(progress) {
+        this.progress = progress;
     };
 
-    StoryView.prototype.getIndex = function() {
-        return this.options.index;
+    StoryView.prototype.render = function() {
+        this.spec = [];
+        this.spec.push({
+            target: this.card.render()
+        });
+
+        this.spec.push({
+            transform: FM.move(FM.scale(1, 1, 1), [15, 15, 0]),
+            target: this.pPic.render()
+        });
+
+        return this.spec;
     };
-
-    // StoryView.prototype.render = function() {
-    //     this.spec = [];
-
-    //     return this.spec;
-    // };
 
     module.exports = StoryView;
 });

@@ -33,8 +33,8 @@ define(function(require, exports, module) {
         this.scale = new Interpolate({
             input_1: 0,
             input_2: this.options.initY,
-            output_1: 1/this.options.cardScale,
-            output_2: 1
+            output_1: 1,
+            output_2: this.options.cardScale
         });
 
         window.app = this;
@@ -55,10 +55,11 @@ define(function(require, exports, module) {
             curve: 'easeOut'
         },
 
-        cardWidth: 142,
         cardScale: 0.445,
         gutter: 2
     };
+    StoriesView.DEFAULT_OPTIONS.cardWidth = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerWidth;
+
     StoriesView.DEFAULT_OPTIONS.cardHeight = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerHeight;
     StoriesView.DEFAULT_OPTIONS.initY = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
     StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
@@ -67,8 +68,8 @@ define(function(require, exports, module) {
     StoriesView.DEFAULT_OPTIONS.scrollOpts = {
         direction: Utility.Direction.X,
         defaultItemSize: [StoriesView.DEFAULT_OPTIONS.cardWidth, StoriesView.DEFAULT_OPTIONS.cardHeight],
-        itemSpacing: 2,
-        margin: window.innerWidth*3,
+        itemSpacing: 2/StoriesView.DEFAULT_OPTIONS.cardScale,
+        margin: window.innerWidth*6,
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
@@ -85,9 +86,7 @@ define(function(require, exports, module) {
             var story = new StoryView({
                 name: Data[i].name,
                 profilePic: Data[i].profilePic,
-                cardWidth: this.options.cardWidth,
-                cardHeight: this.options.cardHeight,
-                index: i
+                scale: this.options.cardScale
             });
 
             story.pipe(this.storiesHandler);
@@ -195,14 +194,16 @@ define(function(require, exports, module) {
     StoriesView.prototype.render = function() {
         var yPos = this.yPos.get();
         var scale = this.scale.calc(yPos);
-        this.progress = Utils.map(scale, 1, 1/this.options.cardScale, 0, 1, true);
+        this.progress = Utils.map(yPos, this.options.initY, 0, 0, 1, true);
 
         this.scrollview.sync.setOptions({
             direction: GenericSync.DIRECTION_X,
             scale: 1/scale
         });
 
-        this.options.scrollOpts.clipSize = window.innerWidth/scale;
+        for(var i = 0; i < this.stories.length; i++) {
+            this.stories[i].setProgress(this.progress);
+        }
 
         this.spec = [];
         this.spec.push({
@@ -210,7 +211,7 @@ define(function(require, exports, module) {
             transform: FM.multiply(FM.aboutOrigin([0, 0, 0], FM.scale(scale, scale, 1)), 
                 FM.translate(0, 0, 0)),
             target: {
-                size: [this.options.cardWidth, this.options.cardHeight],
+                size: [window.innerWidth, window.innerHeight],
                 target: this.scrollview.render()
             }
         });
