@@ -47,7 +47,7 @@ self = this;
         velThreshold: 0.5,
         spring: {
             method: 'spring',
-            period: 2000,
+            period: 600,
             dampingRatio: 1,
         },
         curve: {
@@ -69,7 +69,7 @@ self = this;
         direction: Utility.Direction.X,
         defaultItemSize: [StoriesView.DEFAULT_OPTIONS.cardWidth, StoriesView.DEFAULT_OPTIONS.cardHeight],
         itemSpacing: 2,
-        margin: window.innerWidth*10,
+        margin: window.innerWidth*3,
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
@@ -99,13 +99,15 @@ self = this;
                 if(this.state === 'up') this.initX = 0;
                 else this.initX = story.getPosition()[0];
                 this.initIndex = story.getIndex();
+
+                this.originX = (this.initX + this.options.cardWidth/2)/(6*this.options.cardWidth+12);
             }.bind(this, story));
         }
 
         this.storiesHandler.pipe(this.scrollview);
         this.storiesHandler.pipe(this.ySync);
 
-        var sequence = new ViewSequence(this.stories, 0, false);
+        var sequence = new ViewSequence(this.stories, 0, true);
 
         this.scrollview.sequenceFrom(sequence);
 
@@ -118,7 +120,7 @@ self = this;
 
         this.ySync = new GenericSync(function() {
             return [this.xPos.get(), this.yPos.get()];
-        }.bind(this), {scale: 2.5});
+        }.bind(this));
     };
 
     var setYListeners = function() {
@@ -153,9 +155,9 @@ self = this;
                     if(this.state === 'down') {
                         console.log('sequence,', this.stories[this.snapNode.index].options.name, this.initX);
                         // console.log(this.snapNode.index);
-                        this.scrollview.sequenceFrom(this.snapNode);
+                        // this.scrollview.sequenceFrom(this.snapNode);
                         console.log(this.scrollview.node.index)
-                        this.xPos.set(this.initX);
+                        // this.xPos.set(this.initX);
                     }
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
@@ -164,7 +166,7 @@ self = this;
             }
 
             if(this.direction === 'y') {
-                this.xPos.set(this.initX += data.d[0]);
+                // this.xPos.set(this.initX += data.d[0]);
             }
 
             if(this.direction === 'x' && this.state === 'up') {
@@ -207,6 +209,9 @@ self = this;
 
 
     StoriesView.prototype.slideUp = function(velocity) {
+        var spring = this.options.spring;
+        spring.velocity = velocity;
+
         this.options.scrollOpts.paginated = true;
         this.xPos.set(0, this.options.curve);
         this.yPos.set(0, this.options.curve, function() {
@@ -218,6 +223,8 @@ self = this;
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
+        var spring = this.options.spring;
+        spring.velocity = velocity;
         this.options.scrollOpts.paginated = false;
         this.xPos.set(0, this.options.curve);
         this.yPos.set(this.options.initY, this.options.curve, function() {
@@ -245,9 +252,12 @@ self = this;
         var xStart = this.xStart || 0;
 
         this.spec.push({
-            origin: [0, 0],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(xPos, yPos, 0)),
-            target: this.scrollview.render()
+            origin: [0.5, 1],
+            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, 0, 0)),
+            target: {
+                size: [this.options.cardWidth, this.options.cardHeight],
+                target: this.scrollview.render()
+            }
         });
 
         return this.spec;
