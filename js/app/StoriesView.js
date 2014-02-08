@@ -104,7 +104,7 @@ self = this;
         this.storiesHandler.pipe(this.scrollview);
         this.storiesHandler.pipe(this.ySync);
 
-        var sequence = new ViewSequence(this.stories, 0, false);
+        var sequence = new ViewSequence(this.stories, 0, true);
 
         this.scrollview.sequenceFrom(sequence);
 
@@ -246,8 +246,8 @@ self = this;
         var xStart = this.xStart || 0;
 
         this.spec.push({
-            origin: [0, 1],
-            transform: FM.multiply(FM.aboutOrigin([this.initX, 0, 0], FM.scale(scale, scale, 1)), 
+            origin: [0.5, 1],
+            transform: FM.multiply(FM.aboutOrigin([0, 0, 0], FM.scale(scale, scale, 1)), 
                 FM.translate(0, 0, 0)),
             target: {
                 size: [this.options.cardWidth, this.options.cardHeight],
