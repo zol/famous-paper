@@ -4,7 +4,6 @@ define(function(require, exports, module) {
     var View                = require('famous/View');
     var Modifier            = require('famous/Modifier');
 
-    var EventArbiter        = require('famous/EventArbiter');
     var EventHandler        = require('famous/EventHandler');
     var GenericSync         = require('famous-sync/GenericSync');
     var Transitionable      = require('famous/Transitionable');
@@ -27,8 +26,6 @@ define(function(require, exports, module) {
         createSyncs.call(this);
         createStories.call(this);
         setYListeners.call(this);
-
-        this.eventArbiter = new EventArbiter();
 
         this.scale = new Interpolate({
             input_1: 0,
