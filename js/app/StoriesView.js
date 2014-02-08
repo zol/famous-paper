@@ -3,22 +3,22 @@ define(function(require, exports, module) {
     var FM                  = require('famous/Matrix');
     var View                = require('famous/View');
     var Modifier            = require('famous/Modifier');
-    var Easing              = require('famous-animation/Easing');
+
+    var EventArbiter        = require('famous/EventArbiter');
+    var EventHandler        = require('famous/EventHandler');
     var GenericSync         = require('famous-sync/GenericSync');
     var Transitionable      = require('famous/Transitionable');
     var SpringTransition    = require('famous-physics/utils/SpringTransition');
+
     var Scrollview          = require('famous-views/Scrollview');
-    var ContainerSurface    = require('famous/ContainerSurface');
-    var Utility             = require('famous/Utility');
-    var EventArbiter        = require('famous/EventArbiter');
-    var Time                = require('famous-utils/Time');
     var ViewSequence        = require('famous/ViewSequence');
-    var EventHandler        = require('famous/EventHandler');
+    var Utility             = require('famous/Utility');
+    var Utils               = require('famous-utils/Utils');
 
     var StoryView           = require('./StoryView');
     var Data                = require('./Data');
     var Interpolate         = require('./utils/Interpolate');
-    window.matrix = FM;
+
     Transitionable.registerMethod('spring', SpringTransition);
 
     function StoriesView() {
@@ -37,7 +37,7 @@ define(function(require, exports, module) {
             output_2: 1
         });
 
-self = this;
+        window.app = this;
     }
 
     StoriesView.prototype = Object.create(View.prototype);
@@ -51,19 +51,18 @@ self = this;
             dampingRatio: 1,
         },
         curve: {
-            duration: 250,
+            duration: 200,
             curve: 'easeOut'
         },
 
         cardWidth: 142,
         cardScale: 0.445,
-        gutter: 2,
-        margin: 20
+        gutter: 2
     };
     StoriesView.DEFAULT_OPTIONS.cardHeight = StoriesView.DEFAULT_OPTIONS.cardScale * window.innerHeight;
     StoriesView.DEFAULT_OPTIONS.initY = window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight;
     StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight - StoriesView.DEFAULT_OPTIONS.cardHeight)/2;
-    // StoriesView.DEFAULT_OPTIONS.posThreshold = (window.innerHeight)/2;
+
 
     StoriesView.DEFAULT_OPTIONS.scrollOpts = {
         direction: Utility.Direction.X,
@@ -73,13 +72,12 @@ self = this;
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
-        drag: 0.01
+        drag: 0.005
     };
 
     var createStories = function() {
         this.storiesHandler = new EventHandler();
 
-        var container = new ContainerSurface();
         this.scrollview = new Scrollview(this.options.scrollOpts);
 
         this.stories = [];
@@ -94,11 +92,6 @@ self = this;
 
             story.pipe(this.storiesHandler);
             this.stories.push(story);
-
-            story.on('mousedown', function(event) {
-                this.initX = event.pageX;
-                // this.originX = this.initX/window.innerWidth;
-            }.bind(this))
         }
 
         this.storiesHandler.pipe(this.scrollview);
@@ -107,40 +100,22 @@ self = this;
         var sequence = new ViewSequence(this.stories, 0, true);
 
         this.scrollview.sequenceFrom(sequence);
-
         this.state = 'down';
     };
 
     var createSyncs = function() {
-        this.xPos = new Transitionable(0);
         this.yPos = new Transitionable(this.options.initY);
 
         this.ySync = new GenericSync(function() {
-            return [this.xPos.get(), this.yPos.get()];
+            return [0, this.yPos.get()];
         }.bind(this));
     };
 
     var setYListeners = function() {
         this.ySync.on('start', function(data) {
-            var x = data.pos[0];
             this.touch = true;
 
-            if(this.state === 'down') {
-                this.xStart = x;
-                this.snapNode = findNode.call(this);
-            }
-
             this.direction = undefined;
-
-            function findNode() {
-                var node = this.scrollview.node;
-                while(node.index < this.initIndex) {
-                    node = node._next;
-                }
-
-                return node;
-            }
-
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
@@ -148,26 +123,15 @@ self = this;
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
                     this.storiesHandler.unpipe(this.scrollview);
                     this.direction = 'y';
-
-                    if(this.state === 'down') {
-                        console.log(this.scrollview.node.index)
-                        // this.xPos.set(this.initX);
-                    }
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
                     this.direction = 'x';
                 }
             }
 
-            if(this.direction === 'y') {
-                this.xPos.set(data.p[0]);
-            }
+            this.xPos = data.p[0];
+            this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
 
-            if(this.direction === 'x' && this.state === 'up') {
-                // this.xPos.set(0);
-            }
-
-            this.yPos.set(Math.max(0, data.p[1]));
             if(this.direction === 'x') {
                 if(this.state === 'down') this.yPos.set(this.options.initY);
                 if(this.state === 'up') this.yPos.set(0);
@@ -175,13 +139,15 @@ self = this;
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
+            this.touch = false;
+            this.direction = undefined;
+
             this.storiesHandler.pipe(this.ySync);
             this.storiesHandler.pipe(this.scrollview);
 
-            this.touch = false;
 
             var velocity = data.v[1].toFixed(2);
-            // console.log(velocity);
+
             if(this.yPos.get() < this.options.posThreshold) {
                 console.log(this.state, velocity)
                 if(velocity > this.options.velThreshold) {
@@ -197,7 +163,6 @@ self = this;
                     this.slideDown(velocity);
                 }
             }
-
         }).bind(this));
     };
 
@@ -207,11 +172,10 @@ self = this;
         spring.velocity = velocity;
 
         this.options.scrollOpts.paginated = true;
-        this.xPos.set(0, this.options.curve);
+        this.scrollview.setOptions(this.options.scrollOpts);
+
         this.yPos.set(0, this.options.curve, function() {
             this.state = 'up';
-            console.log(this.state)
-            // this.scrollview.setOptions(this.options.scrollOpts);
         }.bind(this));
 
     };
@@ -219,19 +183,19 @@ self = this;
     StoriesView.prototype.slideDown = function(velocity) {
         var spring = this.options.spring;
         spring.velocity = velocity;
+
         this.options.scrollOpts.paginated = false;
-        this.xPos.set(0, this.options.curve);
+        this.scrollview.setOptions(this.options.scrollOpts);
+
         this.yPos.set(this.options.initY, this.options.curve, function() {
             this.state = 'down';
         }.bind(this));
-
-        // this.scrollview.setOptions(this.options.scrollOpts);
     };
 
     StoriesView.prototype.render = function() {
-        var xPos = this.xPos.get();
         var yPos = this.yPos.get();
         var scale = this.scale.calc(yPos);
+        this.progress = Utils.map(scale, 1, 1/this.options.cardScale, 0, 1, true);
 
         this.scrollview.sync.setOptions({
             direction: GenericSync.DIRECTION_X,
@@ -239,12 +203,8 @@ self = this;
         });
 
         this.options.scrollOpts.clipSize = window.innerWidth/scale;
-        this.scrollview.setOptions(this.options.scrollOpts);
 
         this.spec = [];
-
-        var xStart = this.xStart || 0;
-
         this.spec.push({
             origin: [0.5, 1],
             transform: FM.multiply(FM.aboutOrigin([0, 0, 0], FM.scale(scale, scale, 1)), 
@@ -256,7 +216,6 @@ self = this;
         });
 
         return this.spec;
-
     };
 
     module.exports = StoriesView;
