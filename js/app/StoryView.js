@@ -73,7 +73,7 @@ define(function(require, exports, module) {
     };
 
     StoryView.prototype.getPosition = function() {
-        // console.log(this.options.name, Utils.getSurfacePosition(this.card));
+        console.log(this.options.name, Utils.getSurfacePosition(this.card));
         return Utils.getSurfacePosition(this.card);
     };
 

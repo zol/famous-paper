@@ -23,6 +23,55 @@ define(function(require, exports, module) {
         {
             name: 'Jane Williams',
             profilePic: '../content/profile-pics/jane.jpg'
-        }
+        },
+                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },
+                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },
+                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },
+                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },                {
+            name: 'Jane Williams',
+            profilePic: '../content/profile-pics/jane.jpg'
+        },
     ]
 });

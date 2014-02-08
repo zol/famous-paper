@@ -105,9 +105,9 @@ self = this;
         this.storiesHandler.pipe(this.scrollview);
         this.storiesHandler.pipe(this.ySync);
 
-        var sequence = new ViewSequence(this.stories, 0, true);
+        var sequence = new ViewSequence(this.stories, 0, false);
 
-        this.scrollview.sequenceFrom(this.stories);
+        this.scrollview.sequenceFrom(sequence);
 
         this.state = 'down';
     };
@@ -180,6 +180,10 @@ self = this;
             }
 
             this.yPos.set(Math.max(0, data.p[1]));
+            if(this.direction === 'x') {
+                if(this.state === 'down') this.yPos.set(this.options.initY);
+                if(this.state === 'up') this.yPos.set(0);
+            }
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
@@ -215,12 +219,12 @@ self = this;
     StoriesView.prototype.slideUp = function(velocity) {
         console.log('slide up');
 
+        this.options.scrollOpts.paginated = true;
         this.xPos.set(0, this.options.curve);
         this.yPos.set(0, this.options.curve, function() {
             this.state = 'up';
             console.log(this.state)
-            this.options.scrollOpts.paginated = true;
-            this.scrollview.setOptions(this.options.scrollOpts);
+            // this.scrollview.setOptions(this.options.scrollOpts);
         }.bind(this));
 
     };
@@ -235,7 +239,7 @@ self = this;
             this.state = 'down';
         }.bind(this));
 
-        // this.options.scrollOpts.paginated = false;
+        this.options.scrollOpts.paginated = false;
         // this.scrollview.setOptions(this.options.scrollOpts);
     };
 
