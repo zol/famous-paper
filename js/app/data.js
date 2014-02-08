@@ -2,7 +2,11 @@ define(function(require, exports, module) {
     module.exports = [
         {
             name: 'RJ Pickens',
-            profilePic: '../content/profile-pics/rj.jpg'
+            profilePic: '../content/profile-pics/rj.jpg',
+            text: 'Man, these are some good-looking speakers. #AISAudio okay #VOIDAudio',
+            photos: [
+                '../content/rj/photos/1.jpg'
+            ]
         },
         {
             name: 'Nathalie Pickens',

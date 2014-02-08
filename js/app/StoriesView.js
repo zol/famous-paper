@@ -84,9 +84,11 @@ define(function(require, exports, module) {
         this.stories = [];
         for(var i = 0; i < Data.length; i++) {
             var story = new StoryView({
+                scale: this.options.cardScale,
                 name: Data[i].name,
                 profilePic: Data[i].profilePic,
-                scale: this.options.cardScale
+                text: Data[i].text,
+                photos: Data[i].photos
             });
 
             story.pipe(this.storiesHandler);
