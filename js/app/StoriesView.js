@@ -95,19 +95,16 @@ self = this;
             story.pipe(this.storiesHandler);
             this.stories.push(story);
 
-            story.on('touchstart', function(story) {
-                if(this.state === 'up') this.initX = 0;
-                else this.initX = story.getPosition()[0];
-                this.initIndex = story.getIndex();
-
-                this.originX = (this.initX + this.options.cardWidth/2)/(6*this.options.cardWidth+12);
-            }.bind(this, story));
+            story.on('mousedown', function(event) {
+                this.initX = event.pageX;
+                // this.originX = this.initX/window.innerWidth;
+            }.bind(this))
         }
 
         this.storiesHandler.pipe(this.scrollview);
         this.storiesHandler.pipe(this.ySync);
 
-        var sequence = new ViewSequence(this.stories, 0, true);
+        var sequence = new ViewSequence(this.stories, 0, false);
 
         this.scrollview.sequenceFrom(sequence);
 
@@ -153,9 +150,6 @@ self = this;
                     this.direction = 'y';
 
                     if(this.state === 'down') {
-                        console.log('sequence,', this.stories[this.snapNode.index].options.name, this.initX);
-                        // console.log(this.snapNode.index);
-                        // this.scrollview.sequenceFrom(this.snapNode);
                         console.log(this.scrollview.node.index)
                         // this.xPos.set(this.initX);
                     }
@@ -166,7 +160,7 @@ self = this;
             }
 
             if(this.direction === 'y') {
-                // this.xPos.set(this.initX += data.d[0]);
+                this.xPos.set(data.p[0]);
             }
 
             if(this.direction === 'x' && this.state === 'up') {
@@ -252,8 +246,9 @@ self = this;
         var xStart = this.xStart || 0;
 
         this.spec.push({
-            origin: [0.5, 1],
-            transform: FM.multiply(FM.scale(scale, scale, 1), FM.translate(0, 0, 0)),
+            origin: [0, 1],
+            transform: FM.multiply(FM.aboutOrigin([this.initX, 0, 0], FM.scale(scale, scale, 1)), 
+                FM.translate(0, 0, 0)),
             target: {
                 size: [this.options.cardWidth, this.options.cardHeight],
                 target: this.scrollview.render()
