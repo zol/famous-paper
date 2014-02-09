@@ -69,7 +69,7 @@ define(function(require, exports, module) {
             var properties;
 
             if(!this.options.photos) {
-                if(text.length < 30) {
+                if(text.length < 40) {
                     properties = {
                         fontSize: '28px',
                         lineHeight: '32px'
@@ -86,7 +86,7 @@ define(function(require, exports, module) {
                 } else {
                     properties = {
                         fontSize: '15px',
-                        lineHeight: '20px'
+                        lineHeight: '19px'
                     };
 
                     this.textOrigin = 0;
@@ -95,13 +95,13 @@ define(function(require, exports, module) {
             } else {
                 properties = {
                     fontSize: '15px',
-                    lineHeight: '20px'
+                    lineHeight: '19px'
                 };
 
                 this.textOrigin = 0;
             }
 
-            text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
+            // text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
             this.textLarge = new Surface({
                 size: [this.contentWidth, window.innerHeight * 0.2],
                 content: text,
@@ -118,8 +118,11 @@ define(function(require, exports, module) {
             this.photoImg.width = this.contentWidth;
 
             this.photo = new Surface({
-                size: [this.contentWidth, this.contentWidth],
-                content: this.photoImg
+                size: [this.contentWidth+4, this.contentWidth+4],
+                content: this.photoImg,
+                properties: {
+                    boxShadow: '0 0 5px rgba(0,0,0,0.3)'
+                }
             });
         }
 
@@ -178,16 +181,16 @@ define(function(require, exports, module) {
 
         if(this.options.text) {
             this.spec.push({
-                origin: [0, this.textOrigin],
-                transform: FM.translate(this.options.margin, textPos, 0),
+                origin: [0.5, this.textOrigin],
+                transform: FM.translate(0, textPos, 0),
                 target: this.textLarge.render()
             });
         }
 
         if(this.photo) {
             this.spec.push({
-                origin: [0, 1],
-                transform: FM.translate(this.options.margin, -40, 0),
+                origin: [0.5, 1],
+                transform: FM.translate(0, -68, 0),
                 target: this.photo.render()
             });
         }
