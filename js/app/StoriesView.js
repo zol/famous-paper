@@ -44,7 +44,7 @@ define(function(require, exports, module) {
         velThreshold: 0.5,
         spring: {
             method: 'spring',
-            period: 600,
+            period: 300,
             dampingRatio: 1,
         },
         curve: {
@@ -122,7 +122,7 @@ define(function(require, exports, module) {
         this.ySync.on('update', (function(data) {
             if(!this.direction) {
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
-                    this.storiesHandler.unpipe(this.scrollview);
+                    // this.storiesHandler.unpipe(this.scrollview);
                     this.direction = 'y';
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
@@ -180,7 +180,7 @@ define(function(require, exports, module) {
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
 
-        this.yPos.set(0, this.options.curve, function() {
+        this.yPos.set(0, spring, function() {
             this.state = 'up';
         }.bind(this));
 
@@ -195,7 +195,7 @@ define(function(require, exports, module) {
         this.options.scrollOpts.paginated = false;
         this.scrollview.setOptions(this.options.scrollOpts);
 
-        this.yPos.set(this.options.initY, this.options.curve, function() {
+        this.yPos.set(this.options.initY, spring, function() {
             this.state = 'down';
         }.bind(this));
     };

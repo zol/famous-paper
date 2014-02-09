@@ -79,7 +79,7 @@ define(function(require, exports, module) {
                 } else if(text.length < 280) {
                     properties = {
                         fontSize: '20px',
-                        lineHeight: '25px'
+                        lineHeight: '24px'
                     };
 
                     this.textOrigin = 0.5;
