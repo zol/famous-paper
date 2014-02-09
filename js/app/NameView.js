@@ -13,33 +13,31 @@ define(function(require, exports, module) {
     }
 
     function createSmallName() {
-        var name = this.options.name;
-
         this.smallName = new Surface({
-            size: [this.options.width, window.innerHeight * this.options.height],
-            content: '<span class="story-name">' + name + '</span>',
-            properties: properties
+            size: [this.options.width, 20],
+            content: this.options.name,
+            classes: ['story-name'],
+            properties: {
+                fontSize: '20px',
+            }
         });
 
-        this.smallMod = new Modifier({
-            origin: [0.5, smallOrigin]
-        });
+        this.smallMod = new Modifier();
 
         this._add(this.smallMod).link(this.smallName);
     }
 
     function createLargeName() {
-        var name = this.options.name;
-
         this.largeName = new Surface({
-            size: [this.options.width, window.innerHeight * this.options.height],
-            content: '<span class="story-name">' + name + '</span><p class="story-time">' + this.options.time + '</p>',
-            properties: properties
+            size: [this.options.width, 20],
+            content: this.options.name,
+            classes: ['story-name'],
+            properties: {
+                fontSize: '15px',
+            }
         });
 
-        this.largeMod = new Modifier({
-            origin: [0.5, largeOrigin]
-        });
+        this.largeMod = new Modifier();
 
         this._add(this.largeMod).link(this.largeName);
     }
@@ -49,22 +47,7 @@ define(function(require, exports, module) {
 
     NameView.DEFAULT_OPTIONS = {
         width: 280,
-        name: null,
-
-        smallSmall: {
-            fontSize: '21px',
-            lineHeight: '25px'
-        },
-
-        smallMedium: {
-            fontSize: '28px',
-            lineHeight: '32px'
-        },
-
-        smallLarge: {
-            fontSize: '31px',
-            lineHeight: '35px'
-        }
+        name: null
     };
 
     NameView.prototype.fade = function(progress) {

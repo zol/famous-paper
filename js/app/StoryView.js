@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
+    var NameView            = require('./NameView');
     var TextView            = require('./TextView');
     var FooterView          = require('./FooterView');
 
@@ -55,13 +56,8 @@ define(function(require, exports, module) {
         }
 
         function createName() {
-            this.nameLarge = new Surface({
-                size: [this.contentWidth, 20],
-                content: this.options.name,
-                classes: ['story-name'],
-                properties: {
-                    fontSize: '15px',
-                }
+            this.nameView = new NameView({
+                name: this.options.name
             });
         }
 
@@ -141,7 +137,9 @@ define(function(require, exports, module) {
         var photoPos = this.map(-20, -68);
         var footerPos = this.map(48, 0);
 
+        this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
+
 
         this.spec = [];
         this.spec.push(this.card.render());
@@ -153,7 +151,7 @@ define(function(require, exports, module) {
 
         this.spec.push({
             transform: FM.translate(this.options.margin, namePos, 0),
-            target: this.nameLarge.render()
+            target: this.nameView.render()
         });
 
         if(this.textView) {
