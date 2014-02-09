@@ -18,9 +18,13 @@ define(function(require, exports, module) {
     function StoryView() {
         View.apply(this, arguments);
 
+        this.contentWidth = window.innerWidth - 2*this.options.margin;
+
         createCard.call(this);
         createProfilePic.call(this);
-        createContent.call(this);
+        createName.call(this);
+        createText.call(this);
+        createPhoto.call(this);
         createCover.call(this);
 
         function createCard() {
@@ -33,42 +37,92 @@ define(function(require, exports, module) {
         }
 
         function createProfilePic() {
-            var size = this.options.profilePicSize;
+            this.profileImg = new Image();
+            this.profileImg.src = this.options.profilePic;
+            this.profileImg.width = this.options.profilePicSize;
 
             this.pPic = new Surface({
                 size: [120, 120],
-                content: '<img width="' + size + '" src="' + this.options.profilePic + '" />',
+                content: this.profileImg,
                 properties: {
                     border: '1px solid #ddd'
                 }
             });
         }
 
-        function createContent() {
-            var text = this.options.text;
-            var fontSize;
-            
-            if(text) {
-                if(text.length < 20) {
-                    fontSize = '26px';
-                } else if(text.length < 80) {
-                    fontSize = '20px';
-                } else {
-                    fontSize = '16px';
-                }
-
-                text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
-            }
-
-            this.smallText = new Surface({
-                size: [window.innerWidth - 40, window.innerHeight * 0.2],
-                content: text,
+        function createName() {
+            this.nameLarge = new Surface({
+                size: [this.contentWidth, 20],
+                content: this.options.name,
+                classes: ['story-name'],
                 properties: {
-                    fontSize: fontSize,
-                    lineHeight: '25px'
+                    fontSize: '15px',
                 }
             });
         }
+
+        function createText() {
+            var text = this.options.text;
+            if(!text) return;
+
+            var fontSize;
+            var properties;
+
+            if(!this.options.photos) {
+                if(text.length < 30) {
+                    properties = {
+                        fontSize: '28px',
+                        lineHeight: '32px'
+                    };
+
+                    this.textOrigin = 0.5;
+                } else if(text.length < 280) {
+                    properties = {
+                        fontSize: '20px',
+                        lineHeight: '25px'
+                    };
+
+                    this.textOrigin = 0.5;
+                } else {
+                    properties = {
+                        fontSize: '15px',
+                        lineHeight: '20px'
+                    };
+
+                    this.textOrigin = 0;
+                }
+
+            } else {
+                properties = {
+                    fontSize: '15px',
+                    lineHeight: '20px'
+                };
+
+                this.textOrigin = 0;
+            }
+
+            text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
+            this.textLarge = new Surface({
+                size: [this.contentWidth, window.innerHeight * 0.2],
+                content: text,
+                properties: properties
+            });
+        }
+
+        function createPhoto() {
+            var photos = this.options.photos;
+            if(!photos) return;
+
+            this.photoImg = new Image();
+            this.photoImg.src = photos[0];
+            this.photoImg.width = this.contentWidth;
+
+            this.photo = new Surface({
+                size: [this.contentWidth, this.contentWidth],
+                content: this.photoImg
+            });
+        }
+
 
         function createCover() {
             this.cover = new Surface();
@@ -103,7 +157,11 @@ define(function(require, exports, module) {
 
     StoryView.prototype.render = function() {
         var pPicScale = this.map(1/3/this.options.scale, 0.5);
-        var textPos = this.map(160, 120);
+
+        var namePos = this.map(120, 85);
+
+        if(this.textOrigin) textPos = this.map(20, -15);
+        else textPos = this.map(140, 105);
 
         this.spec = [];
         this.spec.push(this.card.render());
@@ -114,11 +172,28 @@ define(function(require, exports, module) {
         });
 
         this.spec.push({
-            transform: FM.translate(this.options.margin, textPos, 0),
-            target: this.smallText.render()
-        })
+            transform: FM.translate(this.options.margin, namePos, 0),
+            target: this.nameLarge.render()
+        });
+
+        if(this.options.text) {
+            this.spec.push({
+                origin: [0, this.textOrigin],
+                transform: FM.translate(this.options.margin, textPos, 0),
+                target: this.textLarge.render()
+            });
+        }
+
+        if(this.photo) {
+            this.spec.push({
+                origin: [0, 1],
+                transform: FM.translate(this.options.margin, -40, 0),
+                target: this.photo.render()
+            });
+        }
 
         this.spec.push(this.cover.render());
+
         return this.spec;
     };
 

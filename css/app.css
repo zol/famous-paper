@@ -1,8 +1,16 @@
 html {
     background-color: #000;
-    /*color: bl;*/
-} 
+}
+
+body {
+    font-family: 'Helvetica';
+}
+
+.story-name {
+    /*font-family: '';*/
+    font-weight: 800;
+}
 
 .bold {
-    font-weight: bold;
+    font-weight: 600;
 }

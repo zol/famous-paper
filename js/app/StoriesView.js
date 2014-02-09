@@ -48,7 +48,7 @@ define(function(require, exports, module) {
             dampingRatio: 1,
         },
         curve: {
-            duration: 200,
+            duration: 500,
             curve: 'easeOut'
         },
 
@@ -90,12 +90,17 @@ define(function(require, exports, module) {
 
             story.pipe(this.storiesHandler);
             this.stories.push(story);
+
+            story.on('click', function() {
+                console.log('touch')
+                // this.toggle();
+            }.bind(this));
         }
 
         this.storiesHandler.pipe(this.scrollview);
         this.storiesHandler.pipe(this.ySync);
 
-        var sequence = new ViewSequence(this.stories, 0, true);
+        var sequence = new ViewSequence(this.stories, 0, false);
 
         this.scrollview.sequenceFrom(sequence);
         this.state = 'down';
@@ -111,8 +116,6 @@ define(function(require, exports, module) {
 
     var setYListeners = function() {
         this.ySync.on('start', function(data) {
-            this.touch = true;
-
             this.direction = undefined;
         }.bind(this));
 
@@ -137,7 +140,6 @@ define(function(require, exports, module) {
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
-            this.touch = false;
             this.direction = undefined;
 
             this.storiesHandler.pipe(this.ySync);
@@ -164,8 +166,14 @@ define(function(require, exports, module) {
         }).bind(this));
     };
 
+    StoriesView.prototype.toggle = function() {
+        if(this.up) this.slideDown();
+        else this.slideUp();
+        this.up = !this.up;
+    };
 
     StoriesView.prototype.slideUp = function(velocity) {
+        console.log('slide up');
         var spring = this.options.spring;
         spring.velocity = velocity;
 
@@ -179,6 +187,8 @@ define(function(require, exports, module) {
     };
 
     StoriesView.prototype.slideDown = function(velocity) {
+        console.log('slide down');
+
         var spring = this.options.spring;
         spring.velocity = velocity;
 
