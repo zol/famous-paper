@@ -141,6 +141,8 @@ define(function(require, exports, module) {
         var photoPos = this.map(-20, -68);
         var footerPos = this.map(48, 0);
 
+        this.textView.fade(this.progress);
+
         this.spec = [];
         this.spec.push(this.card.render());
 

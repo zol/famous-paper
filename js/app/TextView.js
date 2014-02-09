@@ -3,11 +3,12 @@ define(function(require, exports, module) {
     var Modifier            = require('famous/Modifier');
     var FM                  = require('famous/Matrix');
     var View                = require('famous/View');
+    var Easing              = require('famous-animation/Easing');
 
     function TextView() {
         View.apply(this, arguments);
 
-        // createSmallText.call(this);
+        createSmallText.call(this);
         createLargeText.call(this);
     }
 
@@ -16,40 +17,24 @@ define(function(require, exports, module) {
 
         if(!this.options.photos) {
             if(text.length < 40) {
-                properties = {
-                    fontSize: '28px',
-                    lineHeight: '32px'
-                };
-
-                smallOrigin = 0.5;
+                properties = this.options.smallLarge;
+                smallOrigin = this.options.originLg;
             } else if(text.length < 280) {
-                properties = {
-                    fontSize: '20px',
-                    lineHeight: '24px'
-                };
-
-                smallOrigin = 0.5;
+                properties = this.options.smallMedium;
+                smallOrigin = this.options.originMed;
             } else {
-                properties = {
-                    fontSize: '15px',
-                    lineHeight: '19px'
-                };
-
-                smallOrigin = 0;
+                properties = this.options.smallSmall;
+                smallOrigin = this.options.originSm;
             }
-
         } else {
-            properties = {
-                fontSize: '15px',
-                lineHeight: '19px'
-            };
+            properties = this.options.smallSmall;
 
-            smallOrigin = 0;
+            smallOrigin = this.options.originSm;
         }
 
         this.smallText = new Surface({
             size: [this.options.width, window.innerHeight * this.options.height],
-            content: '<span class="story-text">' + text + '</span><p class="story-time">' + this.options.time + '</p>',
+            content: '<span class="story-text">' + text + '</span>',
             properties: properties
         });
 
@@ -65,35 +50,19 @@ define(function(require, exports, module) {
 
         if(!this.options.photos) {
             if(text.length < 40) {
-                properties = {
-                    fontSize: '28px',
-                    lineHeight: '32px'
-                };
-
-                largeOrigin = 0.5;
+                properties = this.options.largeLarge;
+                largeOrigin = this.options.originLg;
             } else if(text.length < 280) {
-                properties = {
-                    fontSize: '20px',
-                    lineHeight: '24px'
-                };
-
-                largeOrigin = 0.4;
+                properties = this.options.largeMedium;
+                largeOrigin = this.options.originMed;
             } else {
-                properties = {
-                    fontSize: '15px',
-                    lineHeight: '19px'
-                };
-
-                largeOrigin = 0;
+                properties = this.options.largeSmall;
+                largeOrigin = this.options.originSm;
             }
 
         } else {
-            properties = {
-                fontSize: '15px',
-                lineHeight: '19px'
-            };
-
-            largeOrigin = 0;
+            properties = this.options.largeSmall;
+            largeOrigin = this.options.originSm;
         }
 
         // text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
@@ -118,7 +87,42 @@ define(function(require, exports, module) {
         height: 0.3,
         text: null,
         time: null,
-        photos: null
+        photos: null,
+
+        smallLarge: {
+            fontSize: '31px',
+            lineHeight: '35px'
+        },
+        smallMedium: {
+            fontSize: '28px',
+            lineHeight: '32px'
+        },
+        smallSmall: {
+            fontSize: '21px',
+            lineHeight: '25px'
+        },
+
+        largeLarge: {
+            fontSize: '28px',
+            lineHeight: '32px'
+        },
+        largeMedium: {
+            fontSize: '20px',
+            lineHeight: '24px'
+        },
+        largeSmall: {
+            fontSize: '15px',
+            lineHeight: '19px'
+        },
+
+        originLg: 0.5,
+        originMed: 0.4,
+        originSm: 0
+    };
+
+    TextView.prototype.fade = function(progress) {
+        this.smallMod.setOpacity(Easing.inOutQuadNorm.call(this, 1-progress));
+        this.largeMod.setOpacity(Easing.inOutQuadNorm.call(this, progress));
     };
 
     module.exports = TextView;
