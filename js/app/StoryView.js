@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     var Modifier            = require('famous/Modifier');
     var FM                  = require('famous/Matrix');
     var View                = require('famous/View');
-    // var Easing              = require('famous-animation/Easing');
+    var Easing              = require('famous-animation/Easing');
     // var GenericSync         = require('famous-sync/GenericSync');
     // var Transitionable      = require('famous/Transitionable');
     // var SpringTransition    = require('famous-physics/utils/SpringTransition');
@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
+    var TextView            = require('./TextView');
     var FooterView          = require('./FooterView');
 
     // Transitionable.registerMethod('spring', SpringTransition);
@@ -65,50 +66,12 @@ define(function(require, exports, module) {
         }
 
         function createText() {
-            var text = this.options.text;
-            if(!text) return;
+            if(!this.options.text) return;
 
-            var fontSize;
-            var properties;
-
-            if(!this.options.photos) {
-                if(text.length < 40) {
-                    properties = {
-                        fontSize: '28px',
-                        lineHeight: '32px'
-                    };
-
-                    this.textOrigin = 0.5;
-                } else if(text.length < 280) {
-                    properties = {
-                        fontSize: '20px',
-                        lineHeight: '24px'
-                    };
-
-                    this.textOrigin = 0.5;
-                } else {
-                    properties = {
-                        fontSize: '15px',
-                        lineHeight: '19px'
-                    };
-
-                    this.textOrigin = 0;
-                }
-
-            } else {
-                properties = {
-                    fontSize: '15px',
-                    lineHeight: '19px'
-                };
-
-                this.textOrigin = 0;
-            }
-
-            // text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
-            this.textLarge = new Surface({
-                size: [this.contentWidth, window.innerHeight * 0.2],
-                content: '<span class="story-text">' + text + '</span><p class="story-time">' + this.options.time + '</p>',
-                properties: properties
+            this.textView = new TextView({
+                text: this.options.text,
+                time: this.options.time,
+                photos: !!this.options.photos
             });
         }
 
@@ -174,9 +137,9 @@ define(function(require, exports, module) {
         var pPicScale = this.map(1/3/this.options.scale, 0.5);
 
         var namePos = this.map(120, 85);
-
-        if(this.textOrigin) textPos = this.map(20, -15);
-        else textPos = this.map(140, 105);
+        var textPos = this.map(140, 105);
+        var photoPos = this.map(-20, -68);
+        var footerPos = this.map(48, 0);
 
         this.spec = [];
         this.spec.push(this.card.render());
@@ -191,28 +154,36 @@ define(function(require, exports, module) {
             target: this.nameLarge.render()
         });
 
-        if(this.options.text) {
+        if(this.textView) {
             this.spec.push({
-                origin: [0.5, this.textOrigin],
+                origin: [0.5, 0],
                 transform: FM.translate(0, textPos, 0),
-                target: this.textLarge.render()
+                size: [this.options.contentWidth, window.innerHeight - textPos - this.options.margin],
+                target: {
+                    target: this.textView.render()
+                }
             });
         }
 
         if(this.photo) {
             this.spec.push({
                 origin: [0.5, 1],
-                transform: FM.translate(0, -68, 0),
+                transform: FM.translate(0, photoPos, 0.1),
                 target: this.photo.render()
             });
         }
 
         this.spec.push({
             origin: [0.5, 1],
+            transform: FM.translate(0, footerPos, 0),
+            opacity: Easing.inOutQuadNorm.call(this, this.progress),
             target: this.footer.render()
         });
 
-        this.spec.push(this.cover.render());
+        this.spec.push({
+            transform: FM.translate(0, 0, 2),
+            target: this.cover.render()
+        });
 
         return this.spec;
     };

@@ -1,6 +1,17 @@
 define(function(require, exports, module) {
     module.exports = [
         {
+            name: 'RJ Pickens',
+            profilePic: '../content/profile-pics/rj.jpg',
+            text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
+            photos: [
+                '../content/rj/photos/1.jpg'
+            ],
+            time: 'JUST NOW • FRIENDS',
+            likes: 10,
+            comments: 1
+        },
+        {
             name: 'Shu',
             profilePic: '../content/profile-pics/shu.jpg',
             text: 'Sunset party!',
@@ -13,15 +24,6 @@ define(function(require, exports, module) {
             time: '8 MINS &nbsp;SAN FRANCISCO, CA • FRIENDS',
             likes: 9,
             comments: 4
-        },
-        {
-            name: 'RJ Pickens',
-            profilePic: '../content/profile-pics/rj.jpg',
-            text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
-            photos: [
-                '../content/rj/photos/1.jpg'
-            ],
-            time: 'JUST NOW • FRIENDS'
         },
         {
             name: 'Nathalie Pickens',

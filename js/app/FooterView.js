@@ -43,7 +43,7 @@ define(function(require, exports, module) {
         likes: null,
         comments: null,
         margin: 20
-    }
+    };
 
     module.exports = FooterView;
 });
