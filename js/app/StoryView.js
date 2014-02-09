@@ -13,6 +13,8 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
+    var FooterView          = require('./FooterView');
+
     // Transitionable.registerMethod('spring', SpringTransition);
 
     function StoryView() {
@@ -25,6 +27,7 @@ define(function(require, exports, module) {
         createName.call(this);
         createText.call(this);
         createPhoto.call(this);
+        createFooter.call(this);
         createCover.call(this);
 
         function createCard() {
@@ -104,7 +107,7 @@ define(function(require, exports, module) {
             // text = text.replace(/(\#[a-zA-Z0-9\-]+)/g, '<span class="bold">$1</span>');
             this.textLarge = new Surface({
                 size: [this.contentWidth, window.innerHeight * 0.2],
-                content: text,
+                content: '<span class="story-text">' + text + '</span><p class="story-time">' + this.options.time + '</p>',
                 properties: properties
             });
         }
@@ -126,6 +129,9 @@ define(function(require, exports, module) {
             });
         }
 
+        function createFooter() {
+            this.footer = new FooterView();
+        }
 
         function createCover() {
             this.cover = new Surface();
@@ -143,6 +149,9 @@ define(function(require, exports, module) {
         profilePicSize: 120,
         text: null,
         photos: null,
+        time: null,
+        likes: null,
+        comments: null,
 
         margin: 20
     };
@@ -194,6 +203,11 @@ define(function(require, exports, module) {
                 target: this.photo.render()
             });
         }
+
+        this.spec.push({
+            origin: [0.5, 1],
+            target: this.footer.render()
+        });
 
         this.spec.push(this.cover.render());
 

@@ -41,7 +41,7 @@ define(function(require, exports, module) {
     StoriesView.prototype.constructor = StoriesView;
 
     StoriesView.DEFAULT_OPTIONS = {
-        velThreshold: 0.5,
+        velThreshold: 1,
         spring: {
             method: 'spring',
             period: 300,
@@ -70,7 +70,8 @@ define(function(require, exports, module) {
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
-        drag: 0.005
+        speedLimit: 8,
+        drag: 0.001
     };
 
     var createStories = function() {
@@ -85,7 +86,10 @@ define(function(require, exports, module) {
                 name: Data[i].name,
                 profilePic: Data[i].profilePic,
                 text: Data[i].text,
-                photos: Data[i].photos
+                photos: Data[i].photos,
+                time: Data[i].time,
+                likes: Data[i].time,
+                comments: Data[i].time
             });
 
             story.pipe(this.storiesHandler);
@@ -131,11 +135,8 @@ define(function(require, exports, module) {
             }
 
             this.xPos = data.p[0];
-            this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
-
-            if(this.direction === 'x') {
-                if(this.state === 'down') this.yPos.set(this.options.initY);
-                if(this.state === 'up') this.yPos.set(0);
+            if(this.direction === 'y') {
+                this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
             }
         }).bind(this));
 
@@ -143,8 +144,6 @@ define(function(require, exports, module) {
             this.direction = undefined;
 
             this.storiesHandler.pipe(this.ySync);
-            this.storiesHandler.pipe(this.scrollview);
-
 
             var velocity = data.v[1].toFixed(2);
 

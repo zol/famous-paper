@@ -9,7 +9,10 @@ define(function(require, exports, module) {
                 '../content/shu/photos/2.jpg',
                 '../content/shu/photos/3.jpg',
                 '../content/shu/photos/4.jpg'
-            ]
+            ],
+            time: '8 MINS &nbsp;SAN FRANCISCO, CA • FRIENDS',
+            likes: 9,
+            comments: 4
         },
         {
             name: 'RJ Pickens',
@@ -17,7 +20,8 @@ define(function(require, exports, module) {
             text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
             photos: [
                 '../content/rj/photos/1.jpg'
-            ]
+            ],
+            time: 'JUST NOW • FRIENDS'
         },
         {
             name: 'Nathalie Pickens',
@@ -37,7 +41,7 @@ define(function(require, exports, module) {
         {
             name: 'Josh Hoover',
             profilePic: '../content/profile-pics/josh.jpg',
-            text: '"Revolution doesn\'t have to do with smashing something; it has to do with bringing something forth. If you spend all your time thinking about that which you are attacking, then you are negatively bound to it. You have to find the zeal in yourself and bring that out."<p>Joseph Campbell, Pathways to Bliss</p>'
+            text: '"Revolution doesn\'t have to do with smashing something; it has to do with bringing something forth. If you spend all your time thinking about that which you are attacking, then you are negatively bound to it. You have to find the zeal in yourself and bring that out."<br><br>Joseph Campbell, Pathways to Bliss'
         },
         // {
         //     name: 'Jane Williams',

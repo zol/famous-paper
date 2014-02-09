@@ -6,11 +6,17 @@ body {
     font-family: 'Helvetica';
 }
 
+.bold {
+    font-weight: 600;
+}
+
 .story-name {
-    /*font-family: '';*/
     font-weight: 800;
 }
 
-.bold {
-    font-weight: 600;
+.story-time {
+    font-size: 10px;
+    color: #999;
+    margin-top: 12px;
+    line-height: 0px;
 }
