@@ -121,7 +121,7 @@ define(function(require, exports, module) {
             this.photoImg.width = this.contentWidth;
 
             this.photo = new Surface({
-                size: [this.contentWidth+4, this.contentWidth+4],
+                size: [this.contentWidth, this.contentWidth],
                 content: this.photoImg,
                 properties: {
                     boxShadow: '0 0 5px rgba(0,0,0,0.3)'
@@ -130,7 +130,10 @@ define(function(require, exports, module) {
         }
 
         function createFooter() {
-            this.footer = new FooterView();
+            this.footer = new FooterView({
+                likes: this.options.likes,
+                comments: this.options.comments
+            });
         }
 
         function createCover() {

@@ -88,8 +88,8 @@ define(function(require, exports, module) {
                 text: Data[i].text,
                 photos: Data[i].photos,
                 time: Data[i].time,
-                likes: Data[i].time,
-                comments: Data[i].time
+                likes: Data[i].likes,
+                comments: Data[i].comments
             });
 
             story.pipe(this.storiesHandler);

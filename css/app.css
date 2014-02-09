@@ -15,8 +15,19 @@ body {
 }
 
 .story-time {
+    color: #888;
     font-size: 10px;
-    color: #999;
     margin-top: 12px;
     line-height: 0px;
+}
+
+.footer-write, .footer-likes {
+    text-align: right;
+    color: #aaa;
+    font-size: 11px;
+}
+
+.footer-likes {
+    text-align: right;
+    font-weight: bold;
 }
