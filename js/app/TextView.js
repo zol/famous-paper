@@ -115,9 +115,9 @@ define(function(require, exports, module) {
             lineHeight: '19px'
         },
 
-        originLg: 0.5,
-        originMed: 0.4,
-        originSm: 0
+        originLg: 0.45,
+        originMed: 0.35,
+        originSm: 0.01
     };
 
     TextView.prototype.fade = function(progress) {

@@ -44,7 +44,7 @@ define(function(require, exports, module) {
         velThreshold: 1,
         spring: {
             method: 'spring',
-            period: 300,
+            period: 200,
             dampingRatio: 1,
         },
         curve: {
@@ -70,7 +70,7 @@ define(function(require, exports, module) {
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
-        speedLimit: 8,
+        speedLimit: 10,
         drag: 0.001
     };
 

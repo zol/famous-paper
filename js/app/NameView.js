@@ -37,7 +37,9 @@ define(function(require, exports, module) {
             }
         });
 
-        this.largeMod = new Modifier();
+        this.largeMod = new Modifier({
+            transform: FM.translate(0, 2, 0)
+        });
 
         this._add(this.largeMod).link(this.largeName);
     }
