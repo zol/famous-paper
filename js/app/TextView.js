@@ -39,7 +39,7 @@ define(function(require, exports, module) {
         });
 
         this.smallMod = new Modifier({
-            origin: [0.5, smallOrigin]
+            origin: [0, smallOrigin]
         });
 
         this._add(this.smallMod).link(this.smallText);
@@ -73,7 +73,7 @@ define(function(require, exports, module) {
         });
 
         this.largeMod = new Modifier({
-            origin: [0.5, largeOrigin]
+            origin: [0, largeOrigin]
         });
 
         this._add(this.largeMod).link(this.largeText);
@@ -123,6 +123,10 @@ define(function(require, exports, module) {
     TextView.prototype.fade = function(progress) {
         this.smallMod.setOpacity(Easing.inOutQuadNorm.call(this, 1-progress));
         this.largeMod.setOpacity(Easing.inOutQuadNorm.call(this, progress));
+    };
+
+    TextView.prototype.getSize = function() {
+        return [280, 140];
     };
 
     module.exports = TextView;

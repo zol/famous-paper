@@ -124,13 +124,11 @@ define(function(require, exports, module) {
     };
 
     StoryView.prototype.render = function() {
-        var pPicScale = this.map(1/3/this.options.scale, 0.5);
-
         var namePos = this.map(120, 85);
         var textPos = this.map(140, 105);
         var photoPos = this.map(-20, -68);
         var footerPos = this.map(48, 0);
-        var profilePicScale = this.map(2/3, 1/2);
+        var profilePicScale = this.map(1/3/this.options.scale, 0.5);
 
         this.profilePicView.scale(profilePicScale);
         this.nameView.fade(this.progress);
@@ -152,8 +150,7 @@ define(function(require, exports, module) {
 
         if(this.textView) {
             this.spec.push({
-                origin: [0.5, 0],
-                transform: FM.translate(0, textPos, 0),
+                transform: FM.translate(this.options.margin, textPos, 0),
                 size: [this.options.contentWidth, window.innerHeight - textPos - this.options.margin],
                 target: {
                     target: this.textView.render()

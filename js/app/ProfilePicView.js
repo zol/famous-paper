@@ -13,7 +13,7 @@ define(function(require, exports, module) {
         this.profileImg.width = this.options.profilePicSize;
 
         var pic = new Surface({
-            size: [120, 120],
+            size: [this.options.profilePicSize, this.options.profilePicSize],
             content: this.profileImg,
             properties: {
                 border: '1px solid #ddd'
@@ -33,11 +33,12 @@ define(function(require, exports, module) {
     };
 
     ProfilePicView.prototype.scale = function(scale) {
+        this.scaleVal = scale;
         this.mod.setTransform(FM.scale(scale, scale, 1));
     };
 
     ProfilePicView.prototype.getSize = function() {
-        return [this.options.width, this.options.height];
+        return [this.options.profilePicSize*this.scaleVal, this.options.profilePicSize*this.scaleVal];
     };
 
     module.exports = ProfilePicView;

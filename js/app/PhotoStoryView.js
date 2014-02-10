@@ -14,6 +14,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
+    var ProfilePicView      = require('./ProfilePicView');
     var NameView            = require('./NameView');
     var TextView            = require('./TextView');
     var FooterView          = require('./FooterView');
@@ -49,19 +50,12 @@ define(function(require, exports, module) {
         }
 
         function createProfilePic() {
-            this.profileImg = new Image();
-            this.profileImg.src = this.options.profilePicUrl;
-            this.profileImg.width = this.options.profilePicSize;
-
-            this.pPic = new Surface({
-                size: [120, 120],
-                content: this.profileImg,
-                properties: {
-                    border: '1px solid #ddd'
-                }
+            this.profilePicView = new ProfilePicView({
+                profilePicUrl: this.options.profilePicUrl,
+                profilePicSize: this.options.profilePicSize
             });
 
-            this.content.push(this.pPic);
+            this.content.push(this.profilePicView);
         }
 
         function createName() {
@@ -201,7 +195,9 @@ define(function(require, exports, module) {
         var textPos = this.map(140, 105);
         var photoPos = this.map(-20, -68);
         var footerPos = this.map(48, 0);
+        var profilePicScale = this.map(1/3/this.options.scale, 0.5);
 
+        this.profilePicView.scale(profilePicScale);
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
@@ -226,6 +222,7 @@ define(function(require, exports, module) {
         // }
 
         this.spec.push({
+            transform: FM.translate(20, 20, 0),
             target: this.scrollview.render()
         });
 

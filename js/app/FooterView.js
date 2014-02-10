@@ -45,5 +45,9 @@ define(function(require, exports, module) {
         margin: 20
     };
 
+    FooterView.prototype.getSize = function() {
+        return [280, 100];
+    }
+
     module.exports = FooterView;
 });
