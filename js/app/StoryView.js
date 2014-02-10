@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
+    var ProfilePicView      = require('./ProfilePicView');
     var NameView            = require('./NameView');
     var TextView            = require('./TextView');
     var FooterView          = require('./FooterView');
@@ -42,16 +43,9 @@ define(function(require, exports, module) {
         }
 
         function createProfilePic() {
-            this.profileImg = new Image();
-            this.profileImg.src = this.options.profilePic;
-            this.profileImg.width = this.options.profilePicSize;
-
-            this.pPic = new Surface({
-                size: [120, 120],
-                content: this.profileImg,
-                properties: {
-                    border: '1px solid #ddd'
-                }
+            this.profilePicView = new ProfilePicView({
+                profilePicUrl: this.options.profilePicUrl,
+                profilePicSize: this.options.profilePicSize
             });
         }
 
@@ -107,7 +101,7 @@ define(function(require, exports, module) {
     StoryView.DEFAULT_OPTIONS = {
         scale: null,
         name: null,
-        profilePic: null,
+        profilePicUrl: null,
         profilePicSize: 120,
         text: null,
         photos: null,
@@ -136,7 +130,9 @@ define(function(require, exports, module) {
         var textPos = this.map(140, 105);
         var photoPos = this.map(-20, -68);
         var footerPos = this.map(48, 0);
+        var profilePicScale = this.map(2/3, 1/2);
 
+        this.profilePicView.scale(profilePicScale);
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
@@ -145,8 +141,8 @@ define(function(require, exports, module) {
         this.spec.push(this.card.render());
 
         this.spec.push({
-            transform: FM.move(FM.scale(pPicScale, pPicScale, 1), [this.options.margin, this.options.margin, 0]),
-            target: this.pPic.render()
+            transform: FM.translate(this.options.margin, this.options.margin, 0),
+            target: this.profilePicView.render()
         });
 
         this.spec.push({

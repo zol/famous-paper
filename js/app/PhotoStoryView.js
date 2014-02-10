@@ -2,6 +2,7 @@ define(function(require, exports, module) {
     var Engine              = require('famous/Engine');
     var Surface             = require('famous/Surface');
     var Modifier            = require('famous/Modifier');
+    var RenderNode          = require('famous/RenderNode');
     var FM                  = require('famous/Matrix');
     var View                = require('famous/View');
     var Easing              = require('famous-animation/Easing');
@@ -31,7 +32,7 @@ define(function(require, exports, module) {
         createProfilePic.call(this);
         createName.call(this);
         createText.call(this);
-        createPhoto.call(this);
+        createPhotos.call(this);
         createFooter.call(this);
         createScrollview.call(this);
         createCover.call(this);
@@ -49,7 +50,7 @@ define(function(require, exports, module) {
 
         function createProfilePic() {
             this.profileImg = new Image();
-            this.profileImg.src = this.options.profilePic;
+            this.profileImg.src = this.options.profilePicUrl;
             this.profileImg.width = this.options.profilePicSize;
 
             this.pPic = new Surface({
@@ -83,23 +84,33 @@ define(function(require, exports, module) {
             this.content.push(this.textView);
         }
 
-        function createPhoto() {
-            var photos = this.options.photos;
-            if(!photos) return;
+        function createPhotos() {
+            for(var i = 0; i < this.options.photos.length; i++) {
+                this.photoImg = new Image();
+                this.photoImg.src = this.options.photos[i];
+                this.photoImg.width = this.contentWidth;
 
-            this.photoImg = new Image();
-            this.photoImg.src = photos[0];
-            this.photoImg.width = this.contentWidth;
+                var surface = new Surface({
+                    size: [this.contentWidth, this.contentWidth],
+                    content: this.photoImg,
+                    properties: {
+                        boxShadow: '0 0 5px rgba(0,0,0,0.3)'
+                    }
+                });
 
-            this.photo = new Surface({
-                size: [this.contentWidth, this.contentWidth],
-                content: this.photoImg,
-                properties: {
-                    boxShadow: '0 0 5px rgba(0,0,0,0.3)'
+                if(i < 2) {
+                    var node = new RenderNode();
+                    var mod = this['mod' + i] = new Modifier();
+                    node.link(mod).link(surface);
+                    this.content.push(node);
+
+                    node.getSize = function() {
+                        return [280, 280];
+                    };
+                } else {
+                    this.content.push(surface);
                 }
-            });
-
-            this.content.push(this.photo);
+            }
         }
 
         function createFooter() {
@@ -113,7 +124,7 @@ define(function(require, exports, module) {
 
         function createScrollview () {
             this.scrollview = new Scrollview({
-                itemSpacing: 20,
+                itemSpacing: 0,
                 clipSize: undefined,
                 margin: undefined,
                 drag: 0.0001,
@@ -151,7 +162,7 @@ define(function(require, exports, module) {
     PhotoStoryView.DEFAULT_OPTIONS = {
         scale: null,
         name: null,
-        profilePic: null,
+        profilePicUrl: null,
         profilePicSize: 120,
         text: null,
         photos: null,
@@ -205,7 +216,7 @@ define(function(require, exports, module) {
         } else {
             this.top = false;
         }
-console.log(this.top, scrollPos, this.scrollview.node.index)
+
         // if(this.photo) {
         //     this.spec.push({
         //         origin: [0.5, 1],

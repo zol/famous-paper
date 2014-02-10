@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
     function createSmallName() {
         this.smallName = new Surface({
-            size: [this.options.width, 20],
+            size: [this.options.width, this.options.height],
             content: this.options.name,
             classes: ['story-name'],
             properties: {
@@ -29,7 +29,7 @@ define(function(require, exports, module) {
 
     function createLargeName() {
         this.largeName = new Surface({
-            size: [this.options.width, 20],
+            size: [this.options.width, this.options.height],
             content: this.options.name,
             classes: ['story-name'],
             properties: {
@@ -49,12 +49,17 @@ define(function(require, exports, module) {
 
     NameView.DEFAULT_OPTIONS = {
         width: 280,
+        height: 20,
         name: null
     };
 
     NameView.prototype.fade = function(progress) {
         this.smallMod.setOpacity(Easing.inOutQuadNorm.call(this, 1-progress));
         this.largeMod.setOpacity(Easing.inOutQuadNorm.call(this, progress));
+    };
+
+    NameView.prototype.getSize = function() {
+        return [this.options.width, this.options.height];
     };
 
     module.exports = NameView;
