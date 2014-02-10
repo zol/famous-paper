@@ -160,6 +160,7 @@ define(function(require, exports, module) {
                 } else if(this.targetStory.top && data.v[1] > 0) {
                     this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
                     this.targetStory.disableScroll();
+                    this.storyScrollable = false;
                     this.swipable = true;
                 }
             }
@@ -249,7 +250,7 @@ define(function(require, exports, module) {
 
         this.spec = [];
         this.spec.push({
-            origin: [0, 1],
+            origin: [0.5, 1],
             transform: FM.multiply(FM.aboutOrigin([0, 0, 0], FM.scale(scale, scale, 1)), 
                 FM.translate(0, 0, 0)),
             target: {

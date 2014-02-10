@@ -27,8 +27,7 @@ define(function(require, exports, module) {
         });
 
         var likesMod = new Modifier({
-            origin: [1, 1],
-            transform: FM.translate(-this.options.margin, 0, 0)
+            transform: FM.translate(140, 9, 0)
         });
 
         this._add(icons);
@@ -46,7 +45,7 @@ define(function(require, exports, module) {
     };
 
     FooterView.prototype.getSize = function() {
-        return [280, 100];
+        return [280, 50];
     }
 
     module.exports = FooterView;

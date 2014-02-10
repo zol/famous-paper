@@ -167,8 +167,8 @@ define(function(require, exports, module) {
         }
 
         this.spec.push({
-            origin: [0.5, 1],
-            transform: FM.translate(0, footerPos, 0),
+            // origin: [0, 1],
+            transform: FM.translate(this.options.margin, window.innerHeight - this.footer.getSize()[1], 0),
             opacity: Easing.inOutQuadNorm.call(this, this.progress),
             target: this.footer.render()
         });

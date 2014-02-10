@@ -126,7 +126,7 @@ define(function(require, exports, module) {
     };
 
     TextView.prototype.getSize = function() {
-        return [280, 140];
+        return [280, 60];
     };
 
     module.exports = TextView;

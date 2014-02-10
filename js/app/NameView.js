@@ -49,7 +49,7 @@ define(function(require, exports, module) {
 
     NameView.DEFAULT_OPTIONS = {
         width: 280,
-        height: 20,
+        height: 15,
         name: null
     };
 

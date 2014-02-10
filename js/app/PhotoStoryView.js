@@ -50,12 +50,20 @@ define(function(require, exports, module) {
         }
 
         function createProfilePic() {
+            this.content.push(new Surface({
+                size: [undefined, this.options.margin]
+            }));
+
             this.profilePicView = new ProfilePicView({
                 profilePicUrl: this.options.profilePicUrl,
                 profilePicSize: this.options.profilePicSize
             });
 
             this.content.push(this.profilePicView);
+
+            this.content.push(new Surface({
+                size: [undefined, 4]
+            }));
         }
 
         function createName() {
@@ -64,6 +72,10 @@ define(function(require, exports, module) {
             });
 
             this.content.push(this.nameView);
+
+            this.content.push(new Surface({
+                size: [undefined, 2]
+            }));
         }
 
         function createText() {
@@ -104,6 +116,10 @@ define(function(require, exports, module) {
                 } else {
                     this.content.push(surface);
                 }
+
+                this.content.push(new Surface({
+                    size: [undefined, 15]
+                }));
             }
         }
 
@@ -213,16 +229,8 @@ define(function(require, exports, module) {
             this.top = false;
         }
 
-        // if(this.photo) {
-        //     this.spec.push({
-        //         origin: [0.5, 1],
-        //         transform: FM.translate(0, photoPos, 0.1),
-        //         target: this.photo.render()
-        //     });
-        // }
-
         this.spec.push({
-            transform: FM.translate(20, 20, 0),
+            transform: FM.translate(20, 0, 0),
             target: this.scrollview.render()
         });
 
