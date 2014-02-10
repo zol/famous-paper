@@ -15,6 +15,7 @@ define(function(require, exports, module) {
     var Utils               = require('famous-utils/Utils');
 
     var StoryView           = require('./StoryView');
+    var PhotoStoryView      = require('./PhotoStoryView');
     var Data                = require('./Data');
     var Interpolate         = require('./utils/Interpolate');
 
@@ -71,7 +72,8 @@ define(function(require, exports, module) {
         pagePeriod: 300,
         pageDamp: 1,
         speedLimit: 10,
-        drag: 0.001
+        drag: 0.001,
+        friction: 0
     };
 
     var createStories = function() {
@@ -81,24 +83,36 @@ define(function(require, exports, module) {
 
         this.stories = [];
         for(var i = 0; i < Data.length; i++) {
-            var story = new StoryView({
-                scale: this.options.cardScale,
-                name: Data[i].name,
-                profilePic: Data[i].profilePic,
-                text: Data[i].text,
-                photos: Data[i].photos,
-                time: Data[i].time,
-                likes: Data[i].likes,
-                comments: Data[i].comments
-            });
+            if(Data[i].photos && Data[i].photos.length > 1) {
+                var story = new PhotoStoryView({
+                    scale: this.options.cardScale,
+                    name: Data[i].name,
+                    profilePic: Data[i].profilePic,
+                    text: Data[i].text,
+                    photos: Data[i].photos,
+                    time: Data[i].time,
+                    likes: Data[i].likes,
+                    comments: Data[i].comments                    
+                });
+            } else {
+                var story = new StoryView({
+                    scale: this.options.cardScale,
+                    name: Data[i].name,
+                    profilePic: Data[i].profilePic,
+                    text: Data[i].text,
+                    photos: Data[i].photos,
+                    time: Data[i].time,
+                    likes: Data[i].likes,
+                    comments: Data[i].comments
+                });                
+            }
 
             story.pipe(this.storiesHandler);
             this.stories.push(story);
 
-            story.on('click', function() {
-                console.log('touch')
-                // this.toggle();
-            }.bind(this));
+            story.on('touchstart', function(story) {
+                this.targetStory = story;
+            }.bind(this, story));
         }
 
         this.storiesHandler.pipe(this.scrollview);
@@ -121,12 +135,16 @@ define(function(require, exports, module) {
     var setYListeners = function() {
         this.ySync.on('start', function(data) {
             this.direction = undefined;
+            if(this.yPos.get() === 0 && this.targetStory.scrollable) {
+                this.storyScrollable = true;
+                this.swipable = false;
+                this.targetStory.enableScroll();
+            }
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
             if(!this.direction) {
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
-                    // this.storiesHandler.unpipe(this.scrollview);
                     this.direction = 'y';
                 } else {
                     this.storiesHandler.unpipe(this.ySync);
@@ -136,17 +154,33 @@ define(function(require, exports, module) {
 
             this.xPos = data.p[0];
             if(this.direction === 'y') {
-                this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
+                if(!this.storyScrollable) {
+                    this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
+                    this.swipable = true;
+                } else if(this.targetStory.top && data.v[1] > 0) {
+                    this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
+                    this.targetStory.disableScroll();
+                    this.swipable = true;
+                }
+            }
+
+            if(Math.abs(data.v[1]) < Math.abs(data.v[0])) {
+                if(this.targetStory.scrollable && Math.abs(this.targetStory.scrollview.getVelocity()) > 0.05) {
+                    this.storiesHandler.unpipe(this.scrollview);
+                }
             }
         }).bind(this));
 
         this.ySync.on('end', (function(data) {
             this.direction = undefined;
+            this.storyScrollable = false;
+            this.storiesHandler.pipe(this.scrollview);
 
             this.storiesHandler.pipe(this.ySync);
 
             var velocity = data.v[1].toFixed(2);
 
+            if(!this.swipable) return;
             if(this.yPos.get() < this.options.posThreshold) {
                 console.log(this.state, velocity)
                 if(velocity > this.options.velThreshold) {
@@ -215,7 +249,7 @@ define(function(require, exports, module) {
 
         this.spec = [];
         this.spec.push({
-            origin: [0.5, 1],
+            origin: [0, 1],
             transform: FM.multiply(FM.aboutOrigin([0, 0, 0], FM.scale(scale, scale, 1)), 
                 FM.translate(0, 0, 0)),
             target: {

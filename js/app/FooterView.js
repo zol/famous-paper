@@ -8,7 +8,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         this.img = new Image();
-        this.img.src = '../content/footer.png';
+        this.img.src = './img/footer.png';
         this.img.width = this.options.width;
 
         var icons = new Surface({
