@@ -61,9 +61,12 @@ define(function(require, exports, module) {
 
             this.content.push(this.profilePicView);
 
-            this.content.push(new Surface({
-                size: [undefined, 4]
-            }));
+            var node = new RenderNode();
+            node.getSize = function() {
+                return [undefined, this.map(2, 1) * 5];
+            }.bind(this);
+
+            this.content.push(node);
         }
 
         function createName() {
@@ -72,10 +75,6 @@ define(function(require, exports, module) {
             });
 
             this.content.push(this.nameView);
-
-            this.content.push(new Surface({
-                size: [undefined, 2]
-            }));
         }
 
         function createText() {
@@ -138,8 +137,8 @@ define(function(require, exports, module) {
                 clipSize: undefined,
                 margin: undefined,
                 drag: 0.0001,
-                // edgeGrip: 0.5,
-                // edgePeriod: 300,
+                edgeGrip: 1,
+                edgePeriod: 300,
                 // edgeDamp: 1,
                 // paginated: false,
                 // pagePeriod: 500,
@@ -150,6 +149,7 @@ define(function(require, exports, module) {
             });
 
             this.scrollview.sequenceFrom(this.content);
+            this.firstNode = this.scrollview.node;
         }
 
         function createCover() {
@@ -158,11 +158,13 @@ define(function(require, exports, module) {
 
             this.cover.on('touchstart', function() {
                 this.touch = true;
+                this.scrollview.setVelocity(0);
             }.bind(this));
 
             this.cover.on('touchend', function() {
                 this.touch = false;
             }.bind(this));
+
         }
     }
 
@@ -204,6 +206,18 @@ define(function(require, exports, module) {
         this.enable = false;
     };
 
+    PhotoStoryView.prototype.sequence = function() {
+        console.log('sequence');
+        // debugger
+        this.scrollview.setVelocity(0);
+        this.scrollview.setPosition(0);
+        this.scrollview.sequenceFrom(this.firstNode);
+        // while(this.scrollview.node._prev) {
+        //     this.scrollview.goToPreviousPage();
+        //     this.scrollview.setPosition(0);
+        // }
+    };
+
     PhotoStoryView.prototype.render = function() {
         var pPicScale = this.map(1/3/this.options.scale, 0.5);
 
@@ -214,9 +228,9 @@ define(function(require, exports, module) {
         var profilePicScale = this.map(1/3/this.options.scale, 0.5);
 
         this.profilePicView.scale(profilePicScale);
+        this.nameView.setProgress(this.progress);
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
-
 
         this.spec = [];
         this.spec.push(this.card.render());

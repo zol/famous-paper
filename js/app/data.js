@@ -1,20 +1,9 @@
 define(function(require, exports, module) {
     module.exports = [
         {
-            name: 'RJ Pickens',
-            profilePicUrl: './img/profile-pics/rj.jpg',
-            text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
-            photos: [
-                './img/rj/photos/1.jpg'
-            ],
-            time: 'JUST NOW • FRIENDS',
-            likes: 10,
-            comments: 1
-        },
-        {
-            name: 'Shu',
+            name: 'Shupac Takur added 4 new photos with Corban Lee and 4 others',
             profilePicUrl: './img/profile-pics/shu.jpg',
-            text: 'Sunset party!',
+            text: 'Fun times at Sunset Picnic! ',
             photos: [
                 './img/shu/photos/1.jpg',
                 './img/shu/photos/2.jpg',
@@ -26,6 +15,23 @@ define(function(require, exports, module) {
             comments: 4
         },
         {
+            name: 'RJ Pickens',
+            profilePicUrl: './img/profile-pics/rj.jpg',
+            text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
+            photos: [
+                './img/rj/photos/1.jpg'
+            ],
+            time: '2 MINS • FRIENDS',
+            likes: 10,
+            comments: 1
+        },
+        {
+            name: 'Sarah Foster',
+            profilePicUrl: './img/profile-pics/sarah.jpg',
+            text: 'Taxes are done. woo hoo!',
+            time: 'JUST NOW • FRIENDS'
+        },
+        {
             name: 'Nathalie Pickens',
             profilePicUrl: './img/profile-pics/nat.jpg',
             text: '"That song is so corny and i love you."'
@@ -34,11 +40,6 @@ define(function(require, exports, module) {
             name: 'Scuba Steve',
             profilePicUrl: './img/profile-pics/scuba.jpg',
             text: 'In other news I\'m a TOP Sidecar driver now, so if you want a discount code hit me up. Also we operate in East Bay now! Woot!'
-        },
-        {
-            name: 'Sarah Foster',
-            profilePicUrl: './img/profile-pics/sarah.jpg',
-            text: 'Taxes are done. woo hoo!'
         },
         {
             name: 'Josh Hoover',

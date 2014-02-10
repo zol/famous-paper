@@ -121,6 +121,15 @@ define(function(require, exports, module) {
         var sequence = new ViewSequence(this.stories, 0, false);
 
         this.scrollview.sequenceFrom(sequence);
+
+        this.scrollview.on('paginate', function() {
+            if(this.targetStory.scrollable) {
+                this.targetStory.sequence();
+            }
+
+            this.targetStory.disableScroll();
+        }.bind(this));
+
         this.state = 'down';
     };
 

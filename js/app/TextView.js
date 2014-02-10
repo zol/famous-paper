@@ -112,7 +112,8 @@ define(function(require, exports, module) {
         },
         largeSmall: {
             fontSize: '15px',
-            lineHeight: '19px'
+            lineHeight: '19px',
+            // backgroundColor: 'red'
         },
 
         originLg: 0.45,
