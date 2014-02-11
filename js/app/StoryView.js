@@ -13,7 +13,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
-    var ProfilePicView      = require('./ProfilePicView');
+    var ProfilePicsView     = require('./ProfilePicsView');
     var NameView            = require('./NameView');
     var TextView            = require('./TextView');
     var FooterView          = require('./FooterView');
@@ -43,9 +43,9 @@ define(function(require, exports, module) {
         }
 
         function createProfilePic() {
-            this.profilePicView = new ProfilePicView({
-                profilePicUrl: this.options.profilePicUrl,
-                profilePicSize: this.options.profilePicSize
+            this.profilePicsView = new ProfilePicsView({
+                scale: this.options.scale,
+                urls: this.options.profilePics
             });
         }
 
@@ -101,8 +101,7 @@ define(function(require, exports, module) {
     StoryView.DEFAULT_OPTIONS = {
         scale: null,
         name: null,
-        profilePicUrl: null,
-        profilePicSize: 120,
+        profilePics: null,
         text: null,
         photos: null,
         time: null,
@@ -130,7 +129,7 @@ define(function(require, exports, module) {
         var footerPos = this.map(48, 0);
         var profilePicScale = this.map(1/3/this.options.scale, 0.5);
 
-        this.profilePicView.scale(profilePicScale);
+        this.profilePicsView.setProgress(this.progress);
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
@@ -140,7 +139,7 @@ define(function(require, exports, module) {
 
         this.spec.push({
             transform: FM.translate(this.options.margin, this.options.margin, 0),
-            target: this.profilePicView.render()
+            target: this.profilePicsView.render()
         });
 
         this.spec.push({

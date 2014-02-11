@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     function createSmallName() {
         this.smallName = new ExpandingSurface({
             size: [this.options.width, undefined],
-            content: this.options.name,
+            content: '<div>' + this.options.name + '</div>',
             classes: ['story-name'],
             properties: {
                 fontSize: '20px',
@@ -67,12 +67,6 @@ define(function(require, exports, module) {
 
     NameView.prototype.getSize = function() {
         return [this.options.width, Utils.map(this.progress, 0, 1, this.smallName.getSize()[1], this.largeName.getSize()[1])-2];
-    };
-
-    NameView.prototype.getLargeSize = function() {
-        debugger
-        console.log([this.options.width, this.largeName.getSize()[1]])
-        return [this.options.width, this.largeName.getSize()[1]];
     };
 
     module.exports = NameView;

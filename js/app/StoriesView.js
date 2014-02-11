@@ -87,7 +87,7 @@ define(function(require, exports, module) {
                 var story = new PhotoStoryView({
                     scale: this.options.cardScale,
                     name: Data[i].name,
-                    profilePicUrl: Data[i].profilePicUrl,
+                    profilePics: Data[i].profilePics,
                     text: Data[i].text,
                     photos: Data[i].photos,
                     time: Data[i].time,
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
                 var story = new StoryView({
                     scale: this.options.cardScale,
                     name: Data[i].name,
-                    profilePicUrl: Data[i].profilePicUrl,
+                    profilePics: Data[i].profilePics,
                     text: Data[i].text,
                     photos: Data[i].photos,
                     time: Data[i].time,
