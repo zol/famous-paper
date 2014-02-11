@@ -14,9 +14,10 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
+    var Data                = require('../Data/Data');
     var StoryView           = require('./StoryView');
     var PhotoStoryView      = require('./PhotoStoryView');
-    var Data                = require('../Data/Data');
+    var ArticleView         = require('./ArticleView');
 
     Transitionable.registerMethod('spring', SpringTransition);
 
@@ -74,29 +75,31 @@ define(function(require, exports, module) {
         this.scrollview = new Scrollview(this.options.scrollOpts);
 
         this.stories = [];
+
         for(var i = 0; i < Data.length; i++) {
-            if(Data[i].photos && Data[i].photos.length > 1) {
-                var story = new PhotoStoryView({
-                    scale: this.options.cardScale,
-                    name: Data[i].name,
-                    profilePics: Data[i].profilePics,
-                    text: Data[i].text,
-                    photos: Data[i].photos,
-                    time: Data[i].time,
-                    likes: Data[i].likes,
-                    comments: Data[i].comments                    
-                });
+            var story;
+            var info = {
+                profilePics: Data[i].profilePics,
+                name: Data[i].name,
+                text: Data[i].text,
+                time: Data[i].time,
+                likes: Data[i].likes,
+                comments: Data[i].comments,
+                scale: this.options.cardScale
+            }
+
+            if(Data[i].article) {
+                info.article = Data[i].article;
+
+                story = new ArticleView(info);
             } else {
-                var story = new StoryView({
-                    scale: this.options.cardScale,
-                    name: Data[i].name,
-                    profilePics: Data[i].profilePics,
-                    text: Data[i].text,
-                    photos: Data[i].photos,
-                    time: Data[i].time,
-                    likes: Data[i].likes,
-                    comments: Data[i].comments
-                });                
+                info.photos = Data[i].photos;
+
+                if(Data[i].photos && Data[i].photos.length > 1) {
+                    story = new PhotoStoryView(info);
+                } else {
+                    story = new StoryView(info);
+                }
             }
 
             story.pipe(this.storiesHandler);

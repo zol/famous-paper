@@ -1,8 +1,20 @@
 define(function(require, exports, module) {
     module.exports = [
         {
+            name: 'Jane Williams',
+            profilePics:
+                [
+                    './img/profile-pics/jane.jpg'
+                ],
+            text: 'hello world',
+            article: 
+                '<h1>I Could Watch Roy Hibbert Blocking This Little Kid\'s Shot All Day Long</h1>' +
+                '<p>Indiana Pacers big man Roy Hibbert visited Paramount School of Excellence in Indianapolis and relived his childhood when he wasn\'t yet an NBA star for a cute video. The best part is when he swats the crap out of a kid\'s weak layup, which has been GIFed below. (Second-best part is Hibbert using a child as a human shield in dodgeball.)</p>' +
+                '<img src="./roy.gif"/>' +
+                '<p>The GIF\'s really missing the crushing thump of Hibbert\'s hand on the rejection, so watch the video for the full experience.</p>'
+        },
+        {
             name: 'Shupac Takur added 4 new photos with Lee-ann Platt and 5 others',
-            // name: 'Shupac Takur added 4 new photos with Corban Lee and 4 others asdf asdf asdfa sdfasdfasdf asdf asdf aasdf',
             profilePics: 
                 [
                     './img/profile-pics/shu.jpg',
@@ -73,14 +85,6 @@ define(function(require, exports, module) {
                     './img/profile-pics/josh.jpg'
                 ],
             text: '"Revolution doesn\'t have to do with smashing something; it has to do with bringing something forth. If you spend all your time thinking about that which you are attacking, then you are negatively bound to it. You have to find the zeal in yourself and bring that out."<br><br>Joseph Campbell, Pathways to Bliss'
-        },
-        {
-            name: 'Jane Williams',
-            profilePics:
-                [
-                    './img/profile-pics/jane.jpg'
-                ],
-            text: 'hello world'
         },
     ]
 });
