@@ -14,6 +14,7 @@ define(function(require, exports, module) {
     var ContainerSurface    = require('famous/ContainerSurface');
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
+    var VideoSurface        = require('famous/VideoSurface');
 
     var ProfilePicsView     = require('./ProfilePicsView');
     var NameView            = require('./NameView');
@@ -149,17 +150,35 @@ define(function(require, exports, module) {
                 speedLimit: 10
             });
 
-            var content = new ExpandingSurface({
-                size: [280, undefined],
-                classes: ['article'],
-                content: this.options.content
+            var sequence = [];
+
+            this.headerImg = new Image();
+            this.headerImg.src = this.options.content[0];
+            this.headerImg.width = 320;
+
+            var header = new Surface({
+                size: [320, 158],
+                content: this.headerImg
+            });
+
+            header.getSize = function() {
+                return [320, 148];
+            };
+
+            var content = new Surface({
+                size: [280, 900],
+                classes: ['article', 'content'],
+                content: this.options.content[1]
             });
 
             content.getSize = function() {
-                return [280, 800]
-            }
+                return [280, 920]
+            };
 
-            this.scrollview.sequenceFrom(content);
+            sequence.push(header);
+            sequence.push(content);
+
+            this.scrollview.sequenceFrom(sequence);
         }
 
         function createCover() {
@@ -249,7 +268,8 @@ define(function(require, exports, module) {
         // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
         this.spec.push({
-            transform: FM.translate(20, 0, 0),
+            origin: [0.5, 0],
+            transform: FM.translate(0, 0, 0),
             target: this.scrollview.render()
         });
 
