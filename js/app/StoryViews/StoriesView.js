@@ -16,8 +16,7 @@ define(function(require, exports, module) {
 
     var StoryView           = require('./StoryView');
     var PhotoStoryView      = require('./PhotoStoryView');
-    var Data                = require('./Data');
-    var Interpolate         = require('./utils/Interpolate');
+    var Data                = require('../Data/Data');
 
     Transitionable.registerMethod('spring', SpringTransition);
 
@@ -27,13 +26,6 @@ define(function(require, exports, module) {
         createSyncs.call(this);
         createStories.call(this);
         setYListeners.call(this);
-
-        this.scale = new Interpolate({
-            input_1: 0,
-            input_2: this.options.initY,
-            output_1: 1,
-            output_2: this.options.cardScale
-        });
 
         window.app = this;
     }
@@ -244,7 +236,7 @@ define(function(require, exports, module) {
 
     StoriesView.prototype.render = function() {
         var yPos = this.yPos.get();
-        var scale = this.scale.calc(yPos);
+        var scale = Utils.map(yPos, 0, this.options.initY, 1, this.options.cardScale);
         this.progress = Utils.map(yPos, this.options.initY, 0, 0, 1, true);
 
         this.scrollview.sync.setOptions({

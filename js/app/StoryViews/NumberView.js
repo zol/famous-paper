@@ -17,10 +17,7 @@ define(function(require, exports, module) {
         this.lowNum = new Surface({
             size: [this.options.size, this.options.size],
             content: '+' + (this.options.n-1),
-            classes: ['number-view'],
-            properties: {
-                border: '1px solid #ddd'
-            }
+            classes: ['number-view', 'profile-view']
         });
 
         this.lowMod = new Modifier();
@@ -31,10 +28,7 @@ define(function(require, exports, module) {
         this.highNum = new Surface({
             size: [this.options.size, this.options.size],
             content: '+' + this.options.n,
-            classes: ['number-view'],
-            properties: {
-                border: '1px solid #ddd'
-            }
+            classes: ['number-view', 'profile-view']
         });
 
         this.highMod = new Modifier();

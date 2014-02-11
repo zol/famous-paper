@@ -41,3 +41,7 @@ body {
     font-weight: 800;
     color: white;
 }
+
+.profile-view {
+    border: 1px solid #aaa;
+}

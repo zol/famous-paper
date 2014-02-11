@@ -15,9 +15,7 @@ define(function(require, exports, module) {
         var pic = new Surface({
             size: [this.options.size, this.options.size],
             content: this.profileImg,
-            properties: {
-                border: '1px solid #ddd'
-            }
+            classes: ['profile-view']
         });
 
         this.mod = new Modifier();

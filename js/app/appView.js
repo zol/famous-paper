@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     var Transitionable      = require('famous/Transitionable');
     var SpringTransition    = require('famous-physics/utils/SpringTransition');
 
-    var StoriesView         = require('./StoriesView');
+    var StoriesView         = require('./StoryViews/StoriesView');
 
     Transitionable.registerMethod('spring', SpringTransition);
 
