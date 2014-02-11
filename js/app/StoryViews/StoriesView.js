@@ -89,7 +89,9 @@ define(function(require, exports, module) {
             }
 
             if(Data[i].article) {
-                info.article = Data[i].article;
+                info.content = Data[i].article;
+                info.thumbSm = Data[i].articleThumbSm;
+                info.thumbLg = Data[i].articleThumbLg;
 
                 story = new ArticleView(info);
             } else {

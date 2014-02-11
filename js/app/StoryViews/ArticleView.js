@@ -1,6 +1,7 @@
 define(function(require, exports, module) {
     var Engine              = require('famous/Engine');
     var Surface             = require('famous/Surface');
+    var ExpandingSurface    = require('surface-extensions/ExpandingSurface');
     var Modifier            = require('famous/Modifier');
     var RenderNode          = require('famous/RenderNode');
     var FM                  = require('famous/Matrix');
@@ -26,17 +27,17 @@ define(function(require, exports, module) {
 
         // this.contentWidth = window.innerWidth - 2*this.options.margin;
 
-        // this.scrollable = true;
+        this.scrollable = true;
         // this.content = [];
 
-        // createCard.call(this);
+        createCard.call(this);
         // createProfilePic.call(this);
         // createName.call(this);
         // createText.call(this);
         // createPhotos.call(this);
         // createFooter.call(this);
-        // createScrollview.call(this);
-        // createCover.call(this);
+        createScrollview.call(this);
+        createCover.call(this);
 
         function createCard() {
             this.card = new Surface({
@@ -148,8 +149,17 @@ define(function(require, exports, module) {
                 speedLimit: 10
             });
 
-            this.scrollview.sequenceFrom(this.content);
-            this.firstNode = this.scrollview.node;
+            var content = new ExpandingSurface({
+                size: [280, undefined],
+                classes: ['article'],
+                content: this.options.content
+            });
+
+            content.getSize = function() {
+                return [280, 800]
+            }
+
+            this.scrollview.sequenceFrom(content);
         }
 
         function createCover() {
@@ -176,7 +186,9 @@ define(function(require, exports, module) {
         name: null,
         profilePics: null,
         text: null,
-        photos: null,
+        content: null,
+        thumbSm: null,
+        thumbLg: null,
         time: null,
         likes: null,
         comments: null,
@@ -209,46 +221,45 @@ define(function(require, exports, module) {
         console.log('sequence');
         this.scrollview.setVelocity(0);
         this.scrollview.setPosition(0);
-        this.scrollview.sequenceFrom(this.firstNode);
+        // this.scrollview.sequenceFrom(this.firstNode);
     };
 
-    // ArticleView.prototype.render = function() {
-    //     var namePos = this.map(120, 85);
-    //     var textPos = this.map(140, 105);
-    //     var photoPos = this.map(-20, -68);
-    //     var footerPos = this.map(48, 0);
+    ArticleView.prototype.render = function() {
+        // var namePos = this.map(120, 85);
+        // var textPos = this.map(140, 105);
+        // var photoPos = this.map(-20, -68);
+        // var footerPos = this.map(48, 0);
 
-    //     this.profilePicsView.setProgress(this.progress);
-    //     this.nameView.setProgress(this.progress);
-    //     this.nameView.fade(this.progress);
-    //     this.textView.fade(this.progress);
+        // this.profilePicsView.setProgress(this.progress);
+        // this.nameView.setProgress(this.progress);
+        // this.nameView.fade(this.progress);
+        // this.textView.fade(this.progress);
 
-    //     this.spec = [];
-    //     this.spec.push(this.card.render());
+        this.spec = [];
+        this.spec.push(this.card.render());
 
-    //     var scrollPos = this.scrollview.getPosition();
+        var scrollPos = this.scrollview.getPosition();
+        if(scrollPos < 10) {
+            this.top = true;
+        } else {
+            this.top = false;
+        }
 
-    //     if(scrollPos < 10 && this.scrollview.node.index === 0) {
-    //         this.top = true;
-    //     } else {
-    //         this.top = false;
-    //     }
+        // this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
+        // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
-    //     this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
-    //     this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
+        this.spec.push({
+            transform: FM.translate(20, 0, 0),
+            target: this.scrollview.render()
+        });
 
-    //     this.spec.push({
-    //         transform: FM.translate(20, 0, 0),
-    //         target: this.scrollview.render()
-    //     });
+        this.spec.push({
+            transform: FM.translate(0, 0, 2),
+            target: this.cover.render()
+        });
 
-    //     this.spec.push({
-    //         transform: FM.translate(0, 0, 2),
-    //         target: this.cover.render()
-    //     });
-
-    //     return this.spec;
-    // };
+        return this.spec;
+    };
 
     module.exports = ArticleView;
 });

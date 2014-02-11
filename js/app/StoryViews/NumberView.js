@@ -50,7 +50,6 @@ define(function(require, exports, module) {
 
     NumberView.prototype.setScale = function(scale) {
         this.scale = scale;
-        console.log(scale)
         this.lowMod.setTransform(FM.scale(scale, scale, 1));
         this.highMod.setTransform(FM.scale(scale, scale, 1));
     };
