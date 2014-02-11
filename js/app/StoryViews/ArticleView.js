@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     var FM                  = require('famous/Matrix');
     var View                = require('famous/View');
     var Easing              = require('famous-animation/Easing');
+    var ContainerSurface    = require('famous/ContainerSurface');
     // var GenericSync         = require('famous-sync/GenericSync');
     // var Transitionable      = require('famous/Transitionable');
     // var SpringTransition    = require('famous-physics/utils/SpringTransition');
@@ -134,7 +135,7 @@ define(function(require, exports, module) {
         }
 
         function createScrollview () {
-            this.scrollview = new Scrollview({
+            this.scrollview2 = new Scrollview({
                 itemSpacing: 0,
                 clipSize: undefined,
                 margin: window.innerHeight,
@@ -178,7 +179,28 @@ define(function(require, exports, module) {
             sequence.push(header);
             sequence.push(content);
 
-            this.scrollview.sequenceFrom(sequence);
+            this.scrollview2.sequenceFrom(sequence);
+
+            this.topCont = new ContainerSurface({
+                size: [undefined, window.innerHeight/2],
+                properties: {
+                    overflow: 'hidden'
+                }
+            });
+
+            this.bottomCont = new ContainerSurface({
+                size: [undefined, window.innerHeight/2],
+                properties: {
+                    overflow: 'hidden'
+                }
+            });
+
+            var bottomMod = new Modifier({
+                transform: FM.translate(0, 0, 0)
+            });
+
+            this.topCont.add(this.scrollview2);
+            this.bottomCont.add(bottomMod).link(this.scrollview2);
         }
 
         function createCover() {
@@ -187,7 +209,7 @@ define(function(require, exports, module) {
 
             this.cover.on('touchstart', function() {
                 this.touch = true;
-                this.scrollview.setVelocity(0);
+                this.scrollview2.setVelocity(0);
             }.bind(this));
 
             this.cover.on('touchend', function() {
@@ -227,20 +249,20 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.enableScroll = function() {
-        this.cover.pipe(this.scrollview);
+        this.cover.pipe(this.scrollview2);
         this.enable = true;
     };
 
     ArticleView.prototype.disableScroll = function() {
-        this.cover.unpipe(this.scrollview);
+        this.cover.unpipe(this.scrollview2);
         this.enable = false;
     };
 
     ArticleView.prototype.sequence = function() {
         console.log('sequence');
-        this.scrollview.setVelocity(0);
-        this.scrollview.setPosition(0);
-        // this.scrollview.sequenceFrom(this.firstNode);
+        this.scrollview2.setVelocity(0);
+        this.scrollview2.setPosition(0);
+        // this.scrollview2.sequenceFrom(this.firstNode);
     };
 
     ArticleView.prototype.render = function() {
@@ -257,7 +279,7 @@ define(function(require, exports, module) {
         this.spec = [];
         this.spec.push(this.card.render());
 
-        var scrollPos = this.scrollview.getPosition();
+        var scrollPos = this.scrollview2.getPosition();
         if(scrollPos < 10) {
             this.top = true;
         } else {
@@ -270,7 +292,13 @@ define(function(require, exports, module) {
         this.spec.push({
             origin: [0.5, 0],
             transform: FM.translate(0, 0, 0),
-            target: this.scrollview.render()
+            target: this.topCont.render()
+        });
+
+        this.spec.push({
+            origin: [0.5, 0],
+            transform: FM.translate(0, window.innerHeight/2, 0),
+            target: this.bottomCont.render()
         });
 
         this.spec.push({
