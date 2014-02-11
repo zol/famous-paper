@@ -155,4 +155,6 @@ Famous.FamousViews.Scrollview = require('famous-views/Scrollview');
 Famous.FamousViews.SequentialLayout = require('famous-views/SequentialLayout');
 Famous.FamousViews.Shaper = require('famous-views/Shaper');
 Famous.FamousViews.Swappable = require('famous-views/Swappable');
+Famous.SurfaceExtensions = {};
+Famous.SurfaceExtensions.ExpandingSurface = require('surface-extensions/ExpandingSurface');
 module.exports = Famous; });

@@ -135,8 +135,8 @@ define(function(require, exports, module) {
             this.scrollview = new Scrollview({
                 itemSpacing: 0,
                 clipSize: undefined,
-                margin: undefined,
-                drag: 0.0001,
+                margin: window.innerHeight,
+                drag: 0.001,
                 edgeGrip: 1,
                 edgePeriod: 300,
                 // edgeDamp: 1,
@@ -208,14 +208,9 @@ define(function(require, exports, module) {
 
     PhotoStoryView.prototype.sequence = function() {
         console.log('sequence');
-        // debugger
         this.scrollview.setVelocity(0);
         this.scrollview.setPosition(0);
         this.scrollview.sequenceFrom(this.firstNode);
-        // while(this.scrollview.node._prev) {
-        //     this.scrollview.goToPreviousPage();
-        //     this.scrollview.setPosition(0);
-        // }
     };
 
     PhotoStoryView.prototype.render = function() {
@@ -242,6 +237,9 @@ define(function(require, exports, module) {
         } else {
             this.top = false;
         }
+
+        this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
+        this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
         this.spec.push({
             transform: FM.translate(20, 0, 0),

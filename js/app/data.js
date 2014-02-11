@@ -2,6 +2,7 @@ define(function(require, exports, module) {
     module.exports = [
         {
             name: 'Shupac Takur added 4 new photos with Corban Lee and 4 others',
+            // name: 'Shupac Takur added 4 new photos with Corban Lee and 4 others asdf asdf asdfa sdfasdfasdf asdf asdf aasdf',
             profilePicUrl: './img/profile-pics/shu.jpg',
             text: 'Fun times at Sunset Picnic! ',
             photos: [
@@ -10,7 +11,7 @@ define(function(require, exports, module) {
                 './img/shu/photos/3.jpg',
                 './img/shu/photos/4.jpg'
             ],
-            time: '8 MINS &nbsp;SAN FRANCISCO, CA • FRIENDS',
+            time: '8 MINS &nbsp;SAN FRANCISCO, CA &#8226; FRIENDS',
             likes: 9,
             comments: 4
         },
@@ -21,7 +22,7 @@ define(function(require, exports, module) {
             photos: [
                 './img/rj/photos/1.jpg'
             ],
-            time: '2 MINS • FRIENDS',
+            time: '2 MINS &#8226; FRIENDS',
             likes: 10,
             comments: 1
         },
@@ -29,7 +30,7 @@ define(function(require, exports, module) {
             name: 'Sarah Foster',
             profilePicUrl: './img/profile-pics/sarah.jpg',
             text: 'Taxes are done. woo hoo!',
-            time: 'JUST NOW • FRIENDS'
+            time: 'JUST NOW &#8226; FRIENDS'
         },
         {
             name: 'Nathalie Pickens',

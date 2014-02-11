@@ -125,9 +125,8 @@ define(function(require, exports, module) {
         this.scrollview.on('paginate', function() {
             if(this.targetStory.scrollable) {
                 this.targetStory.sequence();
+                this.targetStory.disableScroll();
             }
-
-            this.targetStory.disableScroll();
         }.bind(this));
 
         this.state = 'down';

@@ -69,5 +69,11 @@ define(function(require, exports, module) {
         return [this.options.width, Utils.map(this.progress, 0, 1, this.smallName.getSize()[1], this.largeName.getSize()[1])-2];
     };
 
+    NameView.prototype.getLargeSize = function() {
+        debugger
+        console.log([this.options.width, this.largeName.getSize()[1]])
+        return [this.options.width, this.largeName.getSize()[1]];
+    };
+
     module.exports = NameView;
 });
