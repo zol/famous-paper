@@ -34,7 +34,7 @@ define(function(require, exports, module) {
         createText.call(this);
         createArticle.call(this);
         createFooter.call(this);
-        createCover.call(this);
+        // createCover.call(this);
 
         function createCard() {
             this.card = new Surface({
@@ -87,6 +87,7 @@ define(function(require, exports, module) {
         function createCover() {
             this.cover = new Surface();
             this.cover.pipe(this.eventOutput);
+            this.cover.pipe()
         }
     }
 
@@ -117,6 +118,16 @@ define(function(require, exports, module) {
 
     ArticleStoryView.prototype.map = function(start, end, clamp) {
         return Utils.map(this.progress, 0, 1, start, end, clamp);
+    };
+
+    ArticleStoryView.prototype.enableScroll = function() {
+        // this.cover.pipe(this.scrollview);
+        this.enable = true;
+    };
+
+    ArticleStoryView.prototype.disableScroll = function() {
+        // this.cover.unpipe(this.scrollview);
+        this.enable = false;
     };
 
     ArticleStoryView.prototype.render = function() {
@@ -154,10 +165,16 @@ define(function(require, exports, module) {
             });
         }
 
+        var articleScale = 1;
+
         this.spec.push({
             origin: [0.5, 0],
-            transform: FM.translate(0, 0, 0.001),
-            target: this.article.render()
+            transform: FM.move(FM.scale(articleScale, articleScale, 1), [0, 0, 0.0001]),
+            size: [window.innerWidth, window.innerHeight],
+            target: {
+                target: this.article.render()
+            }
+            // transform: FM.move(FM.scale(0.875, 0.875, 1), [this.options.margin, this.options.margin, 0.001]),
         });
 
         this.spec.push({
@@ -168,7 +185,7 @@ define(function(require, exports, module) {
 
         this.spec.push({
             transform: FM.translate(0, 0, 2),
-            target: this.cover.render()
+            // target: this.cover.render()
         });
 
         return this.spec;

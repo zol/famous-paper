@@ -18,8 +18,9 @@ define(function(require, exports, module) {
     var VideoSurface        = require('famous/VideoSurface');
     var EventHandler        = require('famous/EventHandler');
 
-    var ArticleCoverView    = require('./ArticleCoverView');
+    var ArticleTopView      = require('./ArticleTopView');
     var ArticleBottomView   = require('./ArticleBottomView');
+    var ArticleFullView     = require('./ArticleFullView');
 
     // Transitionable.registerMethod('spring', SpringTransition);
 
@@ -28,101 +29,32 @@ define(function(require, exports, module) {
 
         this.contentWidth = window.innerWidth - 2*this.options.margin;
 
-        createArticleCover.call(this);
+        createArticleTop.call(this);
         createArticleBottom.call(this);
-        createScrollview.call(this);
+        createArticleFull.call(this);
         createCover.call(this);
 
-        function createArticleCover() {
-            this.articleCover = new ArticleCoverView({
+        function createArticleTop() {
+            this.articleTop = new ArticleTopView({
                 content: this.options.content
             });
+
+            this.articleTop.setAngle(1);
         }
 
         function createArticleBottom() {
             this.articleBottom = new ArticleBottomView({
                 content: this.options.content
             });
+
+            this.articleBottom.setAngle(1);
+            this.articleBottom.content.pipe(this.articleTop.scrollview);
         }
 
-        function createScrollview () {
-            for(var i = 1; i < 3; i++) {
-                this['scrollview' + i] = new Scrollview({
-                    itemSpacing: 0,
-                    clipSize: window.innerHeight,
-                    margin: window.innerHeight,
-                    drag: 0.001,
-                    edgeGrip: 1,
-                    edgePeriod: 300,
-                    // edgeDamp: 1,
-                    // paginated: false,
-                    // pagePeriod: 500,
-                    // pageDamp: 0.8,
-                    // pageStopSpeed: Infinity,
-                    // pageSwitchSpeed: 1,
-                    speedLimit: 10
-                });
-
-                var sequence = [];
-
-                this.headerImg = new Image();
-                this.headerImg.src = this.options.content[0];
-                this.headerImg.width = 320;
-
-                var header = new Surface({
-                    size: [320, 158],
-                    content: this.headerImg
-                });
-
-                header.getSize = function() {
-                    return [320, 148];
-                };
-
-                var content = new Surface({
-                    size: [280, 900],
-                    classes: ['article', 'content'],
-                    content: this.options.content[1],
-                    properties: {
-                        backgroundColor: 'white'
-                    }
-                });
-
-                content.getSize = function() {
-                    return [280, 920]
-                };
-
-                sequence.push(header);
-                sequence.push(content);
-
-                this['scrollview' + i].sequenceFrom(sequence);
-            }
-
-            this.topCont = new ContainerSurface({
-                size: [undefined, window.innerHeight/2],
-                properties: {
-                    overflow: 'hidden'
-                }
+        function createArticleFull() {
+            this.articleFull = new ArticleFullView({
+                content: this.options.content
             });
-
-            this.bottomCont = new ContainerSurface({
-                size: [undefined, window.innerHeight/2],
-                properties: {
-                    overflow: 'hidden'
-                }
-            });
-
-            var topMod = new Modifier({
-                origin: [0.5, 0],
-                transform: FM.translate(0, 0, 0)
-            });
-
-            var bottomMod = new Modifier({
-                origin: [0.5, 0],
-                transform: FM.translate(0, -window.innerHeight/2, 0)
-            });
-
-            this.topCont.add(topMod).link(this.scrollview1);
-            this.bottomCont.add(bottomMod).link(this.scrollview2);
         }
 
         function createCover() {
@@ -131,15 +63,15 @@ define(function(require, exports, module) {
 
             this.cover.on('touchstart', function() {
                 this.touch = true;
-                this.scrollview2.setVelocity(0);
+                // this.scrollview2.setVelocity(0);
             }.bind(this));
 
             this.cover.on('touchend', function() {
                 this.touch = false;
             }.bind(this));
 
-            this.cover.pipe(this.articleCover.scrollview);
-            this.cover.pipe(this.articleBottom.scrollview);
+            // this.cover.pipe(this.articleTop.scrollview);
+            // this.cover.pipe(this.articleBottom.scrollview);
         }
     }
 
@@ -198,29 +130,28 @@ define(function(require, exports, module) {
 
         this.spec = [];
 
-        var scrollPos = this.scrollview2.getPosition();
-        if(scrollPos < 10) {
-            this.top = true;
-        } else {
-            this.top = false;
-        }
-
         // this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
         // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
+        this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
+
         this.spec.push({
-            target: this.articleCover.render()
+            target: this.articleFull.render()
+        });
+
+        this.spec.push({
+            // target: this.articleTop.render()
         });
 
         this.spec.push({
             transform: FM.translate(0, window.innerHeight/2, 0),
-            target: this.articleBottom.render()
+            // target: this.articleBottom.render()
         });
 
-        // this.spec.push({
-        //     transform: FM.translate(0, 0, 2),
-        //     target: this.cover.render()
-        // });
+        this.spec.push({
+            transform: FM.translate(0, 0, 2),
+            // target: this.cover.render()
+        });
 
         return this.spec;
     };

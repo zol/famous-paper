@@ -8,84 +8,67 @@ define(function(require, exports, module) {
     var View                = require('famous/View');
     var Scrollview          = require('famous-views/Scrollview');
 
-    function ArticleCoverView() {
+    function ArticleTopView() {
         View.apply(this, arguments);
 
+        createContainer.call(this);
         createBacking.call(this);
         createScrollview.call(this);
     }
 
-    function createBacking() {
-        var surface = new Surface({
-            size: [undefined, window.innerHeight/2],
-            properties: {
-                backgroundColor: '#999'
-            }
-        });
-
-        var mod = new Modifier({
-            origin: [0, 0]
-        });
-
-        this._add(mod).link(surface);
-    }
-
-    function createScrollview() {
-        this.scrollview = new Scrollview(this.options.svOpts);
-
-        var sequence = [];
-
-        this.headerImg = new Image();
-        this.headerImg.src = this.options.content[0];
-        this.headerImg.width = 320;
-
-        var header = new Surface({
-            size: [320, 158],
-            content: this.headerImg
-        });
-
-        header.getSize = function() {
-            return [320, 148];
-        };
-
-        var content = new Surface({
-            size: [280, 900],
-            classes: ['article', 'content'],
-            content: this.options.content[1],
-            properties: {
-                backgroundColor: 'white'
-            }
-        });
-
-        content.getSize = function() {
-            return [280, 920]
-        };
-
-        sequence.push(header);
-        sequence.push(content);
-
-        this.scrollview.sequenceFrom(sequence);
-
-        this.svMod = new Modifier({
-            origin: [0.5, 0]
-        });
-
+    function createContainer() {
         this.container = new ContainerSurface({
             size: [undefined, window.innerHeight/2],
             properties: {
                 overflow: 'hidden'
             }
         });
-
-        this.container.add(this.svMod).link(this.scrollview);
-
-        this._add(this.container);
     }
 
-    ArticleCoverView.prototype = Object.create(View.prototype);
-    ArticleCoverView.prototype.constructor = ArticleCoverView;
+    function createBacking() {
+        var backing = new Surface({
+            size: [undefined, window.innerHeight/2],
+            properties: {
+                backgroundColor: 'white'
+            }
+        });
 
-    ArticleCoverView.DEFAULT_OPTIONS = {
+        this.container.add(backing);
+    }
+
+    function createScrollview() {
+        this.scrollview = new Scrollview(this.options.svOpts);
+
+        this.content = new Surface({
+            size: [320, 1068],
+            classes: ['article', 'content'],
+            content: this.options.content,
+            properties: {
+                backgroundColor: 'white'
+            }
+        });
+
+        this.content.getSize = function() {
+            return [320, 1068]
+        };
+
+        this.scrollview.sequenceFrom([this.content]);
+        this.content.pipe(this.scrollview);
+
+        var svMod = new Modifier({
+            origin: [0.5, 0]
+        });
+
+        this.container.add(svMod).link(this.scrollview);
+
+        this.contMod = new Modifier();
+        this._add(this.contMod).link(this.container);
+    }
+
+    ArticleTopView.prototype = Object.create(View.prototype);
+    ArticleTopView.prototype.constructor = ArticleTopView;
+
+    ArticleTopView.DEFAULT_OPTIONS = {
         scale: null,
         thumbCoverSm: null,
         thumbCoverLg: null,
@@ -107,5 +90,9 @@ define(function(require, exports, module) {
         }
     };
 
-    module.exports = ArticleCoverView;
+    ArticleTopView.prototype.setAngle = function(angle) {
+        this.contMod.setTransform(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-angle)));
+    };
+
+    module.exports = ArticleTopView;
 });

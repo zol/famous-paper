@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     var View                = require('famous/View');
     var Scrollview          = require('famous-views/Scrollview');
 
-    function ArticleBottomView() {
+    function ArticleFullView() {
         View.apply(this, arguments);
 
         createBacking.call(this);
@@ -17,24 +17,20 @@ define(function(require, exports, module) {
 
     function createBacking() {
         var surface = new Surface({
-            size: [undefined, window.innerHeight/2],
+            size: [undefined, undefined],
             properties: {
                 backgroundColor: 'white'
             }
         });
 
-        var mod = new Modifier({
-            origin: [0, 0]
-        });
-
-        this._add(mod).link(surface);
+        this._add(surface);
     }
 
     function createScrollview() {
         this.scrollview = new Scrollview(this.options.svOpts);
 
         this.content = new Surface({
-            size: [320, 1068],
+            size: [320, 1080],
             classes: ['article', 'content'],
             content: this.options.content,
             properties: {
@@ -43,33 +39,19 @@ define(function(require, exports, module) {
         });
 
         this.content.getSize = function() {
-            return [320, 1068]
+            return [320, 1080]
         };
 
         this.scrollview.sequenceFrom([this.content]);
+        this.content.pipe(this.scrollview);
 
-        this.svMod = new Modifier({
-            origin: [0.5, 0],
-            transform: FM.translate(0, -window.innerHeight/2, 0)
-        });
-
-        this.container = new ContainerSurface({
-            size: [undefined, window.innerHeight/2],
-            properties: {
-                overflow: 'hidden'
-            }
-        });
-
-        this.container.add(this.svMod).link(this.scrollview);
-
-        this.contMod = new Modifier();
-        this._add(this.contMod).link(this.container);
+        this._add(this.scrollview);
     }
 
-    ArticleBottomView.prototype = Object.create(View.prototype);
-    ArticleBottomView.prototype.constructor = ArticleBottomView;
+    ArticleFullView.prototype = Object.create(View.prototype);
+    ArticleFullView.prototype.constructor = ArticleFullView;
 
-    ArticleBottomView.DEFAULT_OPTIONS = {
+    ArticleFullView.DEFAULT_OPTIONS = {
         scale: null,
         thumbCoverSm: null,
         thumbCoverLg: null,
@@ -80,7 +62,7 @@ define(function(require, exports, module) {
             margin: window.innerHeight,
             drag: 0.001,
             edgeGrip: 1,
-            edgePeriod: Infinity,
+            edgePeriod: 300,
             // edgeDamp: 1,
             // paginated: false,
             // pagePeriod: 500,
@@ -91,9 +73,5 @@ define(function(require, exports, module) {
         }
     };
 
-    ArticleBottomView.prototype.setAngle = function(angle) {
-        this.contMod.setTransform(FM.rotateX(0));
-    };
-
-    module.exports = ArticleBottomView;
+    module.exports = ArticleFullView;
 });
