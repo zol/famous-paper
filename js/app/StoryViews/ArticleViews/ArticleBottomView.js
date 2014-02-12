@@ -20,7 +20,7 @@ define(function(require, exports, module) {
             size: [320, 320],
             properties: {
                 backgroundColor: 'white',
-                boxShadow: this.options.boxShadow
+                // boxShadow: this.options.boxShadow
             }
         });
 

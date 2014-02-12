@@ -49,7 +49,13 @@ define(function(require, exports, module) {
             }.bind(this));
 
             this.sync.on('end', function() {
-                this.pos.set(0, this.options.curve);
+                if(this.angle < Math.PI/2) {
+                    this.pos.set(-320);
+                    this.articleScale.set(1, this.options.curve);
+                    this.articleTop.set(0, this.options.curve);
+                } else {
+                    this.pos.set(0, this.options.curve);
+                }
             }.bind(this));
         }
 
@@ -62,6 +68,10 @@ define(function(require, exports, module) {
             });
 
             this.card.pipe(this.eventOutput);
+
+            this.card.on('touchstart', function() {
+                // debugger
+            })
         }
 
         function createProfilePic() {
@@ -102,6 +112,9 @@ define(function(require, exports, module) {
             });
 
             this.article.pipe(this.eventOutput);
+
+            this.articleScale = new Transitionable(0.875);
+            this.articleTop = new Transitionable(-68);
 
             this.article.on('touchstart', function() {
                 // debugger
@@ -177,14 +190,16 @@ define(function(require, exports, module) {
     ArticleStoryView.prototype.render = function() {
         var pos = this.pos.get();
 
-        var angle = Utils.map(pos, 0, -320, Math.PI, 0, true);
-        this.article.setAngle(angle);
+        this.angle = Utils.map(pos, 0, -320, Math.PI, 0, true);
+        this.article.setAngle(this.angle);
 
-        // console.log(pos, angle);
+        console.log(pos, this.angle);
+
+        var articleScale = this.articleScale.get();
 
         var namePos = this.map(120, 85);
         var textPos = this.map(140, 105);
-        var photoPos = this.map(-20, -68);
+        var photoPos = this.map(-20, this.articleTop.get());
         var footerPos = this.map(48, 0);
         var profilePicScale = this.map(1/3/this.options.scale, 0.5);
 
@@ -192,7 +207,7 @@ define(function(require, exports, module) {
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
-        this.top = angle === 0;
+        this.top = this.angle === 0;
 
         this.spec = [];
         this.spec.push(this.card.render());
@@ -216,8 +231,6 @@ define(function(require, exports, module) {
                 }
             });
         }
-
-        var articleScale = 0.875;
 
         this.spec.push({
             origin: [0.5, 0],

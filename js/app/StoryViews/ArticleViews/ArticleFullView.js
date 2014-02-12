@@ -23,7 +23,9 @@ define(function(require, exports, module) {
             }
         });
 
-        this._add(surface);
+        // this._add(surface);
+
+        // surface.pipe(this.eventOutput);
     }
 
     function createScrollview() {
@@ -35,7 +37,7 @@ define(function(require, exports, module) {
             content: this.options.content,
             properties: {
                 backgroundColor: 'white',
-                boxShadow: this.options.boxShadow
+                // boxShadow: this.options.boxShadow
             }
         });
 
@@ -46,7 +48,11 @@ define(function(require, exports, module) {
         this.scrollview.sequenceFrom([this.content]);
         this.content.pipe(this.scrollview);
 
-        this._add(this.scrollview);
+        this.mod = new Modifier({
+            transform: FM.translate(0, -9999, 0)
+        });
+
+        this._add(this.mod).link(this.scrollview);
     }
 
     ArticleFullView.prototype = Object.create(View.prototype);
@@ -73,6 +79,14 @@ define(function(require, exports, module) {
             speedLimit: 10
         },
         boxShadow: null
+    };
+
+    ArticleFullView.prototype.hide = function() {
+        this.mod.setTransform(FM.translate(0, -9999, 0));
+    };
+
+    ArticleFullView.prototype.show = function() {
+        this.mod.setTransform(FM.translate(0, 0, 0));
     };
 
     module.exports = ArticleFullView;

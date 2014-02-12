@@ -126,13 +126,17 @@ define(function(require, exports, module) {
 
         this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
 
+        this.spec.push({
+            target: this.articleFull.render()
+        });
+
         if(this.angle === 0) {
-            this.spec.push({
-                // target: this.articleFull.render()
-            });
+            this.articleFull.show();
         }
 
-        // if(this.angle !== 0) {
+        if(this.angle !== 0) {
+            this.articleFull.hide();
+
             this.spec.push({
                 transform: FM.translate(0, 0, 0.0001),
                 target: this.articleTop.render()
@@ -147,7 +151,7 @@ define(function(require, exports, module) {
                 transform: FM.translate(0, 0, 5),
                 // target: this.cover.render()
             });
-        // }
+        }
 
         return this.spec;
     };
