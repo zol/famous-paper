@@ -16,7 +16,7 @@ define(function(require, exports, module) {
     var ProfilePicsView     = require('./ProfilePicsView');
     var NameView            = require('./NameView');
     var TextView            = require('./TextView');
-    var ArticleView         = require('./ArticleViews/ArticleView');
+    var ArticleView         = require('../ArticleViews/ArticleView');
     var FooterView          = require('./FooterView');
 
     Transitionable.registerMethod('spring', SpringTransition);

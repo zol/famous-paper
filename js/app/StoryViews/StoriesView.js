@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
 
-    var Data                = require('../Data/Data');
+    var StoryData           = require('../Data/StoryData');
     var StoryView           = require('./StoryView');
     var PhotoStoryView      = require('./PhotoStoryView');
     var ArticleStoryView    = require('./ArticleStoryView');
@@ -60,7 +60,7 @@ define(function(require, exports, module) {
         direction: Utility.Direction.X,
         defaultItemSize: [StoriesView.DEFAULT_OPTIONS.cardWidth, StoriesView.DEFAULT_OPTIONS.cardHeight],
         itemSpacing: 2/StoriesView.DEFAULT_OPTIONS.cardScale,
-        margin: window.innerWidth*6,
+        margin: window.innerWidth*3,
         pageSwitchSpeed: 0.1,
         pagePeriod: 300,
         pageDamp: 1,
@@ -76,28 +76,28 @@ define(function(require, exports, module) {
 
         this.stories = [];
 
-        for(var i = 0; i < Data.length; i++) {
+        for(var i = 0; i < StoryData.length; i++) {
             var story;
             var info = {
-                profilePics: Data[i].profilePics,
-                name: Data[i].name,
-                text: Data[i].text,
-                time: Data[i].time,
-                likes: Data[i].likes,
-                comments: Data[i].comments,
+                profilePics: StoryData[i].profilePics,
+                name: StoryData[i].name,
+                text: StoryData[i].text,
+                time: StoryData[i].time,
+                likes: StoryData[i].likes,
+                comments: StoryData[i].comments,
                 scale: this.options.cardScale
             }
 
-            if(Data[i].article) {
-                info.content = Data[i].article;
-                info.thumbSm = Data[i].articleThumbSm;
-                info.thumbLg = Data[i].articleThumbLg;
+            if(StoryData[i].article) {
+                info.content = StoryData[i].article;
+                info.thumbSm = StoryData[i].articleThumbSm;
+                info.thumbLg = StoryData[i].articleThumbLg;
 
                 story = new ArticleStoryView(info);
             } else {
-                info.photos = Data[i].photos;
+                info.photos = StoryData[i].photos;
 
-                if(Data[i].photos && Data[i].photos.length > 1) {
+                if(StoryData[i].photos && StoryData[i].photos.length > 1) {
                     story = new PhotoStoryView(info);
                 } else {
                     story = new StoryView(info);
@@ -115,12 +115,13 @@ define(function(require, exports, module) {
         this.storiesHandler.pipe(this.scrollview);
         this.storiesHandler.pipe(this.ySync);
 
-        var sequence = new ViewSequence(this.stories, 0, false);
+        var sequence = new ViewSequence(this.stories, 0, true);
 
         this.scrollview.sequenceFrom(sequence);
 
         this.scrollview.on('paginate', function() {
-            if(this.targetStory.scrollable) {
+            console.log('paginate story')
+            if(this.targetStory.sequence) {
                 this.targetStory.sequence();
                 this.targetStory.disableScroll();
             }
@@ -234,6 +235,7 @@ define(function(require, exports, module) {
 
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
+        this.scrollview.emitPaginate = true;
 
         this.yPos.set(0, spring, function() {
             this.state = 'up';
@@ -252,6 +254,7 @@ define(function(require, exports, module) {
 
         this.yPos.set(this.options.initY, spring, function() {
             this.state = 'down';
+            this.scrollview.emitPaginate = false;
         }.bind(this));
     };
 

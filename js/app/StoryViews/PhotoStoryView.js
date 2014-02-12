@@ -140,7 +140,7 @@ define(function(require, exports, module) {
                 edgeGrip: 1,
                 edgePeriod: 300,
                 // edgeDamp: 1,
-                // paginated: false,
+                paginated: false,
                 // pagePeriod: 500,
                 // pageDamp: 0.8,
                 // pageStopSpeed: Infinity,

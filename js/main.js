@@ -1,9 +1,14 @@
 define(function(require, exports, module) {
 var Famous = function(cb) { cb.call(this, require) };
 Famous.App = {};
-Famous.App.Data_data = require('app/Data/data');
-Famous.App.StoryViews_ArticleCoverView = require('app/StoryViews/ArticleCoverView');
-Famous.App.StoryViews_ArticleView = require('app/StoryViews/ArticleView');
+Famous.App.ArticleViews_ArticleBottomView = require('app/ArticleViews/ArticleBottomView');
+Famous.App.ArticleViews_ArticleFullView = require('app/ArticleViews/ArticleFullView');
+Famous.App.ArticleViews_ArticleTopView = require('app/ArticleViews/ArticleTopView');
+Famous.App.ArticleViews_ArticleView = require('app/ArticleViews/ArticleView');
+Famous.App.CoverViews_CoverView = require('app/CoverViews/CoverView');
+Famous.App.Data_CoverData = require('app/Data/CoverData');
+Famous.App.Data_StoryData = require('app/Data/StoryData');
+Famous.App.StoryViews_ArticleStoryView = require('app/StoryViews/ArticleStoryView');
 Famous.App.StoryViews_FooterView = require('app/StoryViews/FooterView');
 Famous.App.StoryViews_NameView = require('app/StoryViews/NameView');
 Famous.App.StoryViews_NumberView = require('app/StoryViews/NumberView');
@@ -13,7 +18,7 @@ Famous.App.StoryViews_ProfilePicsView = require('app/StoryViews/ProfilePicsView'
 Famous.App.StoryViews_StoriesView = require('app/StoryViews/StoriesView');
 Famous.App.StoryViews_StoryView = require('app/StoryViews/StoryView');
 Famous.App.StoryViews_TextView = require('app/StoryViews/TextView');
-Famous.App.AppView = require('app/appView');
+Famous.App.AppView = require('app/AppView');
 Famous.Famous = {};
 Famous.Famous.CanvasSurface = require('famous/CanvasSurface');
 Famous.Famous.ContainerSurface = require('famous/ContainerSurface');
