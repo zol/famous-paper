@@ -14,11 +14,12 @@ define(function(require, exports, module) {
             articleThumbLg: './img/roy/roylg.jpg',
             article:
                 [
-                    './img/roy/header.jpg',
+                    './img/roy/header.png',
                     '<h1>I Could Watch Roy Hibbert Blocking This Little Kid\'s Shot All Day Long</h1>' +
                     '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
                     '<p>Indiana Pacers big man Roy Hibbert visited Paramount School of Excellence in Indianapolis and relived his childhood when he wasn\'t yet an NBA star for a cute video. The best part is when he swats the crap out of a kid\'s weak layup, which has been GIFed below. (Second-best part is Hibbert using a child as a human shield in dodgeball.)</p>' +
-                    '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
+                    // '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
+                    '<img src="./img/roy/block.jpg" />' +
                     '<p>The GIF\'s really missing the crushing thump of Hibbert\'s hand on the rejection, so watch the video for the full experience.</p>'
                 ]
         },

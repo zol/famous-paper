@@ -16,122 +16,33 @@ define(function(require, exports, module) {
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
     var VideoSurface        = require('famous/VideoSurface');
+    var EventHandler        = require('famous/EventHandler');
 
-    var ProfilePicsView     = require('./ProfilePicsView');
-    var NameView            = require('./NameView');
-    var TextView            = require('./TextView');
-    var FooterView          = require('./FooterView');
+    var ArticleCoverView    = require('./ArticleCoverView');
+    var ArticleBottomView   = require('./ArticleBottomView');
 
     // Transitionable.registerMethod('spring', SpringTransition);
 
     function ArticleView() {
         View.apply(this, arguments);
 
-        // this.contentWidth = window.innerWidth - 2*this.options.margin;
+        this.contentWidth = window.innerWidth - 2*this.options.margin;
 
-        this.scrollable = true;
-        // this.content = [];
-
-        createCard.call(this);
-        // createProfilePic.call(this);
-        // createName.call(this);
-        // createText.call(this);
-        // createPhotos.call(this);
-        // createFooter.call(this);
+        createArticleCover.call(this);
+        createArticleBottom.call(this);
         createScrollview.call(this);
         createCover.call(this);
 
-        function createCard() {
-            this.card = new Surface({
-                properties: {
-                    borderRadius: '5px',
-                    backgroundColor: 'white'
-                }
+        function createArticleCover() {
+            this.articleCover = new ArticleCoverView({
+                content: this.options.content
             });
-
-            this.card.pipe(this.eventOutput);
         }
 
-        function createProfilePic() {
-            this.content.push(new Surface({
-                size: [undefined, this.options.margin]
-            }));
-
-            this.profilePicsView = new ProfilePicsView({
-                scale: this.options.scale,
-                urls: this.options.profilePics
+        function createArticleBottom() {
+            this.articleBottom = new ArticleBottomView({
+                content: this.options.content
             });
-
-            this.content.push(this.profilePicsView);
-
-            var node = new RenderNode();
-            node.getSize = function() {
-                return [undefined, this.map(2, 1) * 5];
-            }.bind(this);
-
-            this.content.push(node);
-        }
-
-        function createName() {
-            this.nameView = new NameView({
-                name: this.options.name
-            });
-
-            this.content.push(this.nameView);
-        }
-
-        function createText() {
-            if(!this.options.text) return;
-
-            this.textView = new TextView({
-                text: this.options.text,
-                time: this.options.time,
-                photos: !!this.options.photos
-            });
-
-            this.content.push(this.textView);
-        }
-
-        function createPhotos() {
-            for(var i = 0; i < this.options.photos.length; i++) {
-                this.photoImg = new Image();
-                this.photoImg.src = this.options.photos[i];
-                this.photoImg.width = this.contentWidth;
-
-                var surface = new Surface({
-                    size: [this.contentWidth, this.contentWidth],
-                    content: this.photoImg,
-                    properties: {
-                        boxShadow: '0 0 5px rgba(0,0,0,0.3)'
-                    }
-                });
-
-                if(i < 2) {
-                    var node = new RenderNode();
-                    var mod = this['mod' + i] = new Modifier();
-                    node.link(mod).link(surface);
-                    this.content.push(node);
-
-                    node.getSize = function() {
-                        return [280, 280];
-                    };
-                } else {
-                    this.content.push(surface);
-                }
-
-                this.content.push(new Surface({
-                    size: [undefined, 15]
-                }));
-            }
-        }
-
-        function createFooter() {
-            this.footer = new FooterView({
-                likes: this.options.likes,
-                comments: this.options.comments
-            });
-
-            this.content.push(this.footer);
         }
 
         function createScrollview () {
@@ -227,6 +138,8 @@ define(function(require, exports, module) {
                 this.touch = false;
             }.bind(this));
 
+            this.cover.pipe(this.articleCover.scrollview);
+            this.cover.pipe(this.articleBottom.scrollview);
         }
     }
 
@@ -235,15 +148,9 @@ define(function(require, exports, module) {
 
     ArticleView.DEFAULT_OPTIONS = {
         scale: null,
-        name: null,
-        profilePics: null,
-        text: null,
         content: null,
         thumbSm: null,
         thumbLg: null,
-        time: null,
-        likes: null,
-        comments: null,
 
         margin: 20
     };
@@ -290,7 +197,6 @@ define(function(require, exports, module) {
         // this.textView.fade(this.progress);
 
         this.spec = [];
-        this.spec.push(this.card.render());
 
         var scrollPos = this.scrollview2.getPosition();
         if(scrollPos < 10) {
@@ -303,22 +209,18 @@ define(function(require, exports, module) {
         // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
         this.spec.push({
-            // transform: FM.move(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-1)), [0, 0, 230]),
-            transform: FM.move(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-1)), [0,0,0]),
-            target: this.topCont.render()
+            target: this.articleCover.render()
         });
 
         this.spec.push({
-            // transform: FM.moveThen(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(1))),
-            transform: FM.move(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(1)), [0,155,0]),
-            // transform: FM.translate(0, window.innerHeight/2, 0),
-            target: this.bottomCont.render()
+            transform: FM.translate(0, window.innerHeight/2, 0),
+            target: this.articleBottom.render()
         });
 
-        this.spec.push({
-            transform: FM.translate(0, 0, 2),
-            target: this.cover.render()
-        });
+        // this.spec.push({
+        //     transform: FM.translate(0, 0, 2),
+        //     target: this.cover.render()
+        // });
 
         return this.spec;
     };

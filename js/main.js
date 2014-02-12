@@ -2,6 +2,8 @@ define(function(require, exports, module) {
 var Famous = function(cb) { cb.call(this, require) };
 Famous.App = {};
 Famous.App.Data_data = require('app/Data/data');
+Famous.App.StoryViews_ArticleCoverView = require('app/StoryViews/ArticleCoverView');
+Famous.App.StoryViews_ArticleView = require('app/StoryViews/ArticleView');
 Famous.App.StoryViews_FooterView = require('app/StoryViews/FooterView');
 Famous.App.StoryViews_NameView = require('app/StoryViews/NameView');
 Famous.App.StoryViews_NumberView = require('app/StoryViews/NumberView');

@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     var Data                = require('../Data/Data');
     var StoryView           = require('./StoryView');
     var PhotoStoryView      = require('./PhotoStoryView');
-    var ArticleView         = require('./ArticleView');
+    var ArticleStoryView    = require('./ArticleStoryView');
 
     Transitionable.registerMethod('spring', SpringTransition);
 
@@ -93,7 +93,7 @@ define(function(require, exports, module) {
                 info.thumbSm = Data[i].articleThumbSm;
                 info.thumbLg = Data[i].articleThumbLg;
 
-                story = new ArticleView(info);
+                story = new ArticleStoryView(info);
             } else {
                 info.photos = Data[i].photos;
 

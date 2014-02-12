@@ -1,0 +1,19 @@
+
+.article .header {
+    width: 320px;
+}
+
+.article h1 {
+    font-size: 29px;
+    line-height: 130%;
+}
+
+.article.content img {
+    width: 280px;
+}
+
+.article.content p {
+    font-family: 'Georgia';
+    font-size: '14px';
+    line-height: 150%;
+}

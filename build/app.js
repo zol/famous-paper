@@ -35,4 +35,5 @@ Famous(function(require,exports,module)
     var appView = new AppView();
 
     Context.link(appView);
+    Context.setPerspective(2000);
 });
