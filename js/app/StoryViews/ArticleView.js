@@ -135,51 +135,56 @@ define(function(require, exports, module) {
         }
 
         function createScrollview () {
-            this.scrollview2 = new Scrollview({
-                itemSpacing: 0,
-                clipSize: undefined,
-                margin: window.innerHeight,
-                drag: 0.001,
-                edgeGrip: 1,
-                edgePeriod: 300,
-                // edgeDamp: 1,
-                // paginated: false,
-                // pagePeriod: 500,
-                // pageDamp: 0.8,
-                // pageStopSpeed: Infinity,
-                // pageSwitchSpeed: 1,
-                speedLimit: 10
-            });
+            for(var i = 1; i < 3; i++) {
+                this['scrollview' + i] = new Scrollview({
+                    itemSpacing: 0,
+                    clipSize: window.innerHeight,
+                    margin: window.innerHeight,
+                    drag: 0.001,
+                    edgeGrip: 1,
+                    edgePeriod: 300,
+                    // edgeDamp: 1,
+                    // paginated: false,
+                    // pagePeriod: 500,
+                    // pageDamp: 0.8,
+                    // pageStopSpeed: Infinity,
+                    // pageSwitchSpeed: 1,
+                    speedLimit: 10
+                });
 
-            var sequence = [];
+                var sequence = [];
 
-            this.headerImg = new Image();
-            this.headerImg.src = this.options.content[0];
-            this.headerImg.width = 320;
+                this.headerImg = new Image();
+                this.headerImg.src = this.options.content[0];
+                this.headerImg.width = 320;
 
-            var header = new Surface({
-                size: [320, 158],
-                content: this.headerImg
-            });
+                var header = new Surface({
+                    size: [320, 158],
+                    content: this.headerImg
+                });
 
-            header.getSize = function() {
-                return [320, 148];
-            };
+                header.getSize = function() {
+                    return [320, 148];
+                };
 
-            var content = new Surface({
-                size: [280, 900],
-                classes: ['article', 'content'],
-                content: this.options.content[1]
-            });
+                var content = new Surface({
+                    size: [280, 900],
+                    classes: ['article', 'content'],
+                    content: this.options.content[1],
+                    properties: {
+                        backgroundColor: 'white'
+                    }
+                });
 
-            content.getSize = function() {
-                return [280, 920]
-            };
+                content.getSize = function() {
+                    return [280, 920]
+                };
 
-            sequence.push(header);
-            sequence.push(content);
+                sequence.push(header);
+                sequence.push(content);
 
-            this.scrollview2.sequenceFrom(sequence);
+                this['scrollview' + i].sequenceFrom(sequence);
+            }
 
             this.topCont = new ContainerSurface({
                 size: [undefined, window.innerHeight/2],
@@ -195,11 +200,17 @@ define(function(require, exports, module) {
                 }
             });
 
-            var bottomMod = new Modifier({
+            var topMod = new Modifier({
+                origin: [0.5, 0],
                 transform: FM.translate(0, 0, 0)
             });
 
-            this.topCont.add(this.scrollview2);
+            var bottomMod = new Modifier({
+                origin: [0.5, 0],
+                transform: FM.translate(0, -window.innerHeight/2, 0)
+            });
+
+            this.topCont.add(topMod).link(this.scrollview1);
             this.bottomCont.add(bottomMod).link(this.scrollview2);
         }
 
@@ -249,11 +260,13 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.enableScroll = function() {
+        this.cover.pipe(this.scrollview1);
         this.cover.pipe(this.scrollview2);
         this.enable = true;
     };
 
     ArticleView.prototype.disableScroll = function() {
+        this.cover.unpipe(this.scrollview1);
         this.cover.unpipe(this.scrollview2);
         this.enable = false;
     };
@@ -290,14 +303,15 @@ define(function(require, exports, module) {
         // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
         this.spec.push({
-            origin: [0.5, 0],
-            transform: FM.translate(0, 0, 0),
+            // transform: FM.move(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-1)), [0, 0, 230]),
+            transform: FM.move(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-1)), [0,0,0]),
             target: this.topCont.render()
         });
 
         this.spec.push({
-            origin: [0.5, 0],
-            transform: FM.translate(0, window.innerHeight/2, 0),
+            // transform: FM.moveThen(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(1))),
+            transform: FM.move(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(1)), [0,155,0]),
+            // transform: FM.translate(0, window.innerHeight/2, 0),
             target: this.bottomCont.render()
         });
 
