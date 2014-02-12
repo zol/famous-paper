@@ -11,9 +11,27 @@ define(function(require, exports, module) {
     function ArticleTopView() {
         View.apply(this, arguments);
 
+        createCover.call(this);
         createContainer.call(this);
         createBacking.call(this);
         createScrollview.call(this);
+    }
+
+    function createCover() {
+        this.coverLgImg = new Image();
+        this.coverLgImg.src = this.options.thumbCoverLg;
+        this.coverLgImg.width = 320;
+
+        this.coverLg = new Surface({
+            size: [undefined, window.innerHeight/2],
+            content: this.coverLgImg
+        });
+
+        this.thumbLgMod = new Modifier({
+            transform: FM.rotateZ(Math.PI)
+        });
+
+        this._add(this.thumbLgMod).link(this.cover);
     }
 
     function createContainer() {
@@ -53,7 +71,6 @@ define(function(require, exports, module) {
         };
 
         this.scrollview.sequenceFrom([this.content]);
-        this.content.pipe(this.scrollview);
 
         var svMod = new Modifier({
             origin: [0.5, 0]
@@ -79,7 +96,7 @@ define(function(require, exports, module) {
             margin: window.innerHeight,
             drag: 0.001,
             edgeGrip: 1,
-            edgePeriod: 300,
+            edgePeriod: Infinity,
             // edgeDamp: 1,
             // paginated: false,
             // pagePeriod: 500,

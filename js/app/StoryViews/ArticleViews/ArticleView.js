@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     var Easing              = require('famous-animation/Easing');
     var ContainerSurface    = require('famous/ContainerSurface');
     // var GenericSync         = require('famous-sync/GenericSync');
-    // var Transitionable      = require('famous/Transitionable');
+    var Transitionable      = require('famous/Transitionable');
     // var SpringTransition    = require('famous-physics/utils/SpringTransition');
     var Scrollview          = require('famous-views/Scrollview');
     var ContainerSurface    = require('famous/ContainerSurface');
@@ -34,27 +34,27 @@ define(function(require, exports, module) {
         createArticleFull.call(this);
         createCover.call(this);
 
+        this.angle = new Transitionable(0);
+
         function createArticleTop() {
             this.articleTop = new ArticleTopView({
                 content: this.options.content
             });
-
-            this.articleTop.setAngle(1);
         }
 
         function createArticleBottom() {
             this.articleBottom = new ArticleBottomView({
                 content: this.options.content
             });
-
-            this.articleBottom.setAngle(1);
-            this.articleBottom.content.pipe(this.articleTop.scrollview);
         }
 
         function createArticleFull() {
             this.articleFull = new ArticleFullView({
                 content: this.options.content
             });
+
+            this.articleFull.content.pipe(this.articleTop.scrollview);
+            this.articleFull.content.pipe(this.articleBottom.scrollview);
         }
 
         function createCover() {
@@ -118,6 +118,10 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.render = function() {
+        var angle = this.angle.get();
+
+        this.articleTop.setAngle(angle);
+        this.articleBottom.setAngle(angle);
         // var namePos = this.map(120, 85);
         // var textPos = this.map(140, 105);
         // var photoPos = this.map(-20, -68);
@@ -135,18 +139,21 @@ define(function(require, exports, module) {
 
         this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
 
-        this.spec.push({
-            target: this.articleFull.render()
-        });
+        if(angle === Math.PI) {
+            this.spec.push({
+                target: this.articleFull.render()
+            });
+        }
+        if(angle !== Math.PI) {
+            this.spec.push({
+                target: this.articleTop.render()
+            });
 
-        this.spec.push({
-            // target: this.articleTop.render()
-        });
-
-        this.spec.push({
-            transform: FM.translate(0, window.innerHeight/2, 0),
-            // target: this.articleBottom.render()
-        });
+            this.spec.push({
+                transform: FM.translate(0, window.innerHeight/2, 0),
+                target: this.articleBottom.render()
+            });
+        }
 
         this.spec.push({
             transform: FM.translate(0, 0, 2),
