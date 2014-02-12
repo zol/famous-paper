@@ -17,9 +17,10 @@ define(function(require, exports, module) {
 
     function createBacking() {
         var surface = new Surface({
-            size: [undefined, window.innerHeight/2],
+            size: [320, 320],
             properties: {
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                boxShadow: this.options.boxShadow
             }
         });
 
@@ -38,7 +39,7 @@ define(function(require, exports, module) {
             classes: ['article', 'content'],
             content: this.options.content,
             properties: {
-                backgroundColor: 'white'
+                backgroundColor: 'white',
             }
         });
 
@@ -52,11 +53,11 @@ define(function(require, exports, module) {
 
         this.svMod = new Modifier({
             origin: [0.5, 0],
-            transform: FM.translate(0, -window.innerHeight/2, 0)
+            transform: FM.translate(0, -320, 0)
         });
 
         this.container = new ContainerSurface({
-            size: [undefined, window.innerHeight/2],
+            size: [undefined, 320],
             properties: {
                 overflow: 'hidden'
             }
@@ -90,7 +91,8 @@ define(function(require, exports, module) {
             // pageStopSpeed: Infinity,
             // pageSwitchSpeed: 1,
             speedLimit: 10
-        }
+        },
+        boxShadow: null
     };
 
     ArticleBottomView.prototype.setAngle = function(angle) {

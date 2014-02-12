@@ -43,6 +43,7 @@ define(function(require, exports, module) {
         });
 
         this._add(this.smallMod).link(this.smallText);
+        this.smallText.pipe(this.eventOutput);
     }
 
     function createLargeText() {
@@ -77,6 +78,7 @@ define(function(require, exports, module) {
         });
 
         this._add(this.largeMod).link(this.largeText);
+        this.largeText.pipe(this.eventOutput);
     }
 
     TextView.prototype = Object.create(View.prototype);

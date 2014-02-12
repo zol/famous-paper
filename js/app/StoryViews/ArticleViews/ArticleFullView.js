@@ -34,7 +34,8 @@ define(function(require, exports, module) {
             classes: ['article', 'content'],
             content: this.options.content,
             properties: {
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                boxShadow: this.options.boxShadow
             }
         });
 
@@ -70,7 +71,8 @@ define(function(require, exports, module) {
             // pageStopSpeed: Infinity,
             // pageSwitchSpeed: 1,
             speedLimit: 10
-        }
+        },
+        boxShadow: null
     };
 
     module.exports = ArticleFullView;

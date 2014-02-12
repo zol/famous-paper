@@ -26,6 +26,8 @@ define(function(require, exports, module) {
             this.picViews.push(view);
 
             this._add(mod).link(view);
+
+            view.pipe(this.eventOutput);
         }
 
         if(this.options.urls.length > 3) {

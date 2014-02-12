@@ -13,13 +13,13 @@ define(function(require, exports, module) {
 
         createContainer.call(this);
         createCover.call(this);
-        createBacking.call(this);
+        // createBacking.call(this);
         createScrollview.call(this);
     }
 
     function createContainer() {
         this.container = new ContainerSurface({
-            size: [undefined, window.innerHeight/2],
+            size: [undefined, 320],
             properties: {
                 overflow: 'hidden'
             }
@@ -34,8 +34,11 @@ define(function(require, exports, module) {
         this.coverLgImg.width = 320;
 
         this.coverLg = new Surface({
-            size: [320, 320],
-            content: this.coverLgImg
+            size: [320, 274],
+            content: this.coverLgImg,
+            properties: {
+                // boxShadow: this.options.boxShadow
+            }
         });
 
         this.thumbLgMod = new Modifier();
@@ -47,13 +50,13 @@ define(function(require, exports, module) {
 
     function createBacking() {
         var backing = new Surface({
-            size: [320, window.innerHeight/2],
+            size: [320, 320],
             properties: {
                 backgroundColor: 'white'
             }
         });
 
-        // this.container.add(backing);
+        this.container.add(backing);
     }
 
     function createScrollview() {
@@ -64,7 +67,8 @@ define(function(require, exports, module) {
             classes: ['article', 'content'],
             content: this.options.content,
             properties: {
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                // boxShadow: this.options.boxShadow
             }
         });
 
@@ -106,12 +110,13 @@ define(function(require, exports, module) {
             // pageStopSpeed: Infinity,
             // pageSwitchSpeed: 1,
             speedLimit: 10
-        }
+        },
+        boxShadow: null
     };
 
     ArticleTopView.prototype.setAngle = function(angle) {
-        this.contMod.setTransform(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-angle)));
-        this.thumbLgMod.setTransform(FM.moveThen([0, window.innerHeight/2, 0], FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotate(-angle + Math.PI, 0, 0))));
+        this.contMod.setTransform(FM.aboutOrigin([0, 320, 0], FM.rotateX(-angle)));
+        this.thumbLgMod.setTransform(FM.moveThen([0, 320, 0], FM.aboutOrigin([0, 320, 0], FM.rotate(-angle + Math.PI, 0, 0))));
     };
 
     module.exports = ArticleTopView;

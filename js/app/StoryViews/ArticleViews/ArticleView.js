@@ -40,17 +40,13 @@ define(function(require, exports, module) {
         }
 
         function createArticleBottom() {
-            this.articleBottom = new ArticleBottomView({
-                content: this.options.content
-            });
+            this.articleBottom = new ArticleBottomView(this.options);
 
             this.articleBottom.pipe(this.eventOutput);
         }
 
         function createArticleFull() {
-            this.articleFull = new ArticleFullView({
-                content: this.options.content
-            });
+            this.articleFull = new ArticleFullView(this.options);
 
             this.articleFull.content.pipe(this.articleTop.scrollview);
             this.articleFull.content.pipe(this.articleBottom.scrollview);
@@ -79,7 +75,8 @@ define(function(require, exports, module) {
         thumbSm: null,
         thumbLg: null,
 
-        margin: 20
+        margin: 20,
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)'
     };
 
     ArticleView.prototype.getSize = function() {
@@ -131,23 +128,24 @@ define(function(require, exports, module) {
 
         if(this.angle === 0) {
             this.spec.push({
-                target: this.articleFull.render()
+                // target: this.articleFull.render()
             });
         }
 
         // if(this.angle !== 0) {
             this.spec.push({
+                transform: FM.translate(0, 0, 0.0001),
                 target: this.articleTop.render()
             });
 
             this.spec.push({
-                transform: FM.translate(0, window.innerHeight/2, 0),
+                transform: FM.translate(0, 320, 0),
                 target: this.articleBottom.render()
             });
 
             this.spec.push({
-                transform: FM.translate(0, 0, 2),
-                target: this.cover.render()
+                transform: FM.translate(0, 0, 5),
+                // target: this.cover.render()
             });
         // }
 

@@ -177,7 +177,7 @@ define(function(require, exports, module) {
     ArticleStoryView.prototype.render = function() {
         var pos = this.pos.get();
 
-        var angle = Utils.map(pos, 0, -320, Math.PI-0.5, 0, true);
+        var angle = Utils.map(pos, 0, -320, Math.PI, 0, true);
         this.article.setAngle(angle);
 
         // console.log(pos, angle);
@@ -221,7 +221,7 @@ define(function(require, exports, module) {
 
         this.spec.push({
             origin: [0.5, 0],
-            transform: FM.move(FM.scale(articleScale, articleScale, 1), [0, 0, 0.0001]),
+            transform: FM.move(FM.scale(articleScale, articleScale, 1), [0, photoPos, 0.0001]),
             size: [window.innerWidth, window.innerHeight],
             target: {
                 target: this.article.render()
@@ -236,7 +236,7 @@ define(function(require, exports, module) {
 
         if(!this.enable) {
             this.spec.push({
-                transform: FM.translate(0, 0, 10),
+                transform: FM.translate(0, 0, 20),
                 // target: this.cover.render()
             });
         }

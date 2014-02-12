@@ -32,6 +32,9 @@ define(function(require, exports, module) {
 
         this._add(icons);
         this._add(likesMod).link(likes);
+
+        icons.pipe(this.eventOutput);
+        likes.pipe(this.eventOutput);
     }
 
     FooterView.prototype = Object.create(View.prototype);

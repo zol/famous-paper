@@ -20,6 +20,8 @@ define(function(require, exports, module) {
 
         this.mod = new Modifier();
         this._link(this.mod).link(pic);
+
+        pic.pipe(this.eventOutput);
     }
 
     ProfilePicView.prototype = Object.create(View.prototype);
