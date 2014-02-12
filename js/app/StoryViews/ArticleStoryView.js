@@ -5,9 +5,9 @@ define(function(require, exports, module) {
     var FM                  = require('famous/Matrix');
     var View                = require('famous/View');
     var Easing              = require('famous-animation/Easing');
-    // var GenericSync         = require('famous-sync/GenericSync');
-    // var Transitionable      = require('famous/Transitionable');
-    // var SpringTransition    = require('famous-physics/utils/SpringTransition');
+    var GenericSync         = require('famous-sync/GenericSync');
+    var Transitionable      = require('famous/Transitionable');
+    var SpringTransition    = require('famous-physics/utils/SpringTransition');
     var Scrollview          = require('famous-views/Scrollview');
     var ContainerSurface    = require('famous/ContainerSurface');
     var Utility             = require('famous/Utility');
@@ -19,7 +19,7 @@ define(function(require, exports, module) {
     var ArticleView         = require('./ArticleViews/ArticleView');
     var FooterView          = require('./FooterView');
 
-    // Transitionable.registerMethod('spring', SpringTransition);
+    Transitionable.registerMethod('spring', SpringTransition);
 
     function ArticleStoryView() {
         View.apply(this, arguments);
@@ -28,13 +28,30 @@ define(function(require, exports, module) {
 
         this.contentWidth = window.innerWidth - 2*this.options.margin;
 
+        createSync.call(this);
         createCard.call(this);
         createProfilePic.call(this);
         createName.call(this);
         createText.call(this);
         createArticle.call(this);
         createFooter.call(this);
-        // createCover.call(this);
+        createCover.call(this);
+
+        function createSync() {
+            this.pos = new Transitionable(0);
+
+            this.sync = new GenericSync(function() {
+                return this.pos.get();
+            }.bind(this), {direction: Utility.Direction.Y});
+
+            this.sync.on('update', function(data) {
+                this.pos.set(data.p);
+            }.bind(this));
+
+            this.sync.on('end', function() {
+                this.pos.set(0, this.options.curve);
+            }.bind(this));
+        }
 
         function createCard() {
             this.card = new Surface({
@@ -43,6 +60,8 @@ define(function(require, exports, module) {
                     backgroundColor: 'white'
                 }
             });
+
+            this.card.pipe(this.eventOutput);
         }
 
         function createProfilePic() {
@@ -50,12 +69,16 @@ define(function(require, exports, module) {
                 scale: this.options.scale,
                 urls: this.options.profilePics
             });
+
+            this.profilePicsView.pipe(this.eventOutput);
         }
 
         function createName() {
             this.nameView = new NameView({
                 name: this.options.name
             });
+
+            this.nameView.pipe(this.eventOutput);
         }
 
         function createText() {
@@ -66,6 +89,8 @@ define(function(require, exports, module) {
                 time: this.options.time,
                 photos: true
             });
+
+            this.textView.pipe(this.eventOutput);
         }
 
         function createArticle() {
@@ -77,6 +102,7 @@ define(function(require, exports, module) {
             });
 
             this.article.pipe(this.eventOutput);
+
             this.article.on('touchstart', function() {
                 // debugger
             })
@@ -87,12 +113,18 @@ define(function(require, exports, module) {
                 likes: this.options.likes,
                 comments: this.options.comments
             });
+
+            this.footer.pipe(this.eventOutput);
         }
 
         function createCover() {
-            this.cover = new Surface();
+            this.cover = new Surface({
+                properties: {
+                    backgroundColor: 'blue'
+                }
+            });
+
             this.cover.pipe(this.eventOutput);
-            this.cover.pipe()
         }
     }
 
@@ -111,7 +143,12 @@ define(function(require, exports, module) {
         likes: null,
         comments: null,
 
-        margin: 20
+        margin: 20,
+
+        curve: {
+            duration: 300,
+            curve: 'easeOut'
+        }
     };
 
     ArticleStoryView.prototype.getSize = function() {
@@ -128,14 +165,19 @@ define(function(require, exports, module) {
     ArticleStoryView.prototype.enableScroll = function() {
         // this.cover.pipe(this.scrollview);
         this.enable = true;
+        this.article.pipe(this.sync);    
     };
 
     ArticleStoryView.prototype.disableScroll = function() {
         // this.cover.unpipe(this.scrollview);
         this.enable = false;
+        this.article.unpipe(this.sync);
     };
 
     ArticleStoryView.prototype.render = function() {
+        var pos = this.pos.get();
+        console.log(pos);
+
         var namePos = this.map(120, 85);
         var textPos = this.map(140, 105);
         var photoPos = this.map(-20, -68);
@@ -180,7 +222,6 @@ define(function(require, exports, module) {
             target: {
                 target: this.article.render()
             }
-            // transform: FM.move(FM.scale(0.875, 0.875, 1), [this.options.margin, this.options.margin, 0.001]),
         });
 
         this.spec.push({
@@ -189,10 +230,12 @@ define(function(require, exports, module) {
             target: this.footer.render()
         });
 
-        this.spec.push({
-            transform: FM.translate(0, 0, 2),
-            // target: this.cover.render()
-        });
+        if(!this.enable) {
+            this.spec.push({
+                transform: FM.translate(0, 0, 10),
+                // target: this.cover.render()
+            });
+        }
 
         return this.spec;
     };
