@@ -15,7 +15,6 @@ define(function(require, exports, module) {
     var ContainerSurface    = require('famous/ContainerSurface');
     var Utility             = require('famous/Utility');
     var Utils               = require('famous-utils/Utils');
-    var VideoSurface        = require('famous/VideoSurface');
     var EventHandler        = require('famous/EventHandler');
 
     var ArticleTopView      = require('./ArticleTopView');
@@ -63,15 +62,11 @@ define(function(require, exports, module) {
 
             this.cover.on('touchstart', function() {
                 this.touch = true;
-                // this.scrollview2.setVelocity(0);
             }.bind(this));
 
             this.cover.on('touchend', function() {
                 this.touch = false;
             }.bind(this));
-
-            // this.cover.pipe(this.articleTop.scrollview);
-            // this.cover.pipe(this.articleBottom.scrollview);
         }
     }
 
@@ -144,6 +139,7 @@ define(function(require, exports, module) {
                 target: this.articleFull.render()
             });
         }
+
         if(angle !== Math.PI) {
             this.spec.push({
                 target: this.articleTop.render()
@@ -153,12 +149,12 @@ define(function(require, exports, module) {
                 transform: FM.translate(0, window.innerHeight/2, 0),
                 target: this.articleBottom.render()
             });
-        }
 
-        this.spec.push({
-            transform: FM.translate(0, 0, 2),
-            // target: this.cover.render()
-        });
+            this.spec.push({
+                transform: FM.translate(0, 0, 2),
+                target: this.cover.render()
+            });
+        }
 
         return this.spec;
     };

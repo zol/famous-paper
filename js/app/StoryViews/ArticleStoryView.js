@@ -75,6 +75,11 @@ define(function(require, exports, module) {
                 thumbSm: this.options.thumbSm,
                 thumbLg: this.options.thumbLg,
             });
+
+            this.article.pipe(this.eventOutput);
+            this.article.on('touchstart', function() {
+                // debugger
+            })
         }
 
         function createFooter() {
@@ -141,6 +146,7 @@ define(function(require, exports, module) {
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
+        this.top = this.article.angle.get() === 0 ? true: false;
 
         this.spec = [];
         this.spec.push(this.card.render());
