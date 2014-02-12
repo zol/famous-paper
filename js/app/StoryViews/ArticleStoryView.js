@@ -24,7 +24,8 @@ define(function(require, exports, module) {
     function ArticleStoryView() {
         View.apply(this, arguments);
 
-        this.scrollable = true;
+        this.flipable = true;
+        this.closed = true;
 
         this.contentWidth = window.innerWidth - 2*this.options.margin;
 
@@ -46,6 +47,7 @@ define(function(require, exports, module) {
 
             this.sync.on('update', function(data) {
                 this.pos.set(data.p);
+                this.top = false;
             }.bind(this));
 
             this.sync.on('end', function() {
@@ -53,8 +55,10 @@ define(function(require, exports, module) {
                     this.pos.set(-320);
                     this.articleScale.set(1, this.options.curve);
                     this.articleTop.set(0, this.options.curve);
+                    this.closed = false;
                 } else {
                     this.pos.set(0, this.options.curve);
+                    this.closed = true;
                 }
             }.bind(this));
         }
@@ -68,10 +72,6 @@ define(function(require, exports, module) {
             });
 
             this.card.pipe(this.eventOutput);
-
-            this.card.on('touchstart', function() {
-                // debugger
-            })
         }
 
         function createProfilePic() {
@@ -112,13 +112,10 @@ define(function(require, exports, module) {
             });
 
             this.article.pipe(this.eventOutput);
+            // this.article.pipe(this.sync);
 
             this.articleScale = new Transitionable(0.875);
             this.articleTop = new Transitionable(-68);
-
-            this.article.on('touchstart', function() {
-                // debugger
-            })
         }
 
         function createFooter() {
@@ -159,8 +156,8 @@ define(function(require, exports, module) {
         margin: 20,
 
         curve: {
-            duration: 300,
-            curve: 'easeOut'
+            duration: 500,
+            curve: 'easeInOut'
         }
     };
 
@@ -178,7 +175,7 @@ define(function(require, exports, module) {
     ArticleStoryView.prototype.enableScroll = function() {
         // this.cover.pipe(this.scrollview);
         this.enable = true;
-        this.article.pipe(this.sync);    
+        this.article.pipe(this.sync);
     };
 
     ArticleStoryView.prototype.disableScroll = function() {

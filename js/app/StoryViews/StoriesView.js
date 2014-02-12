@@ -145,6 +145,12 @@ define(function(require, exports, module) {
                 this.swipable = false;
                 this.targetStory.enableScroll();
             }
+
+            if(this.yPos.get() === 0 && this.targetStory.flipable) {
+                this.swipable = false;
+                this.storyFlipable = true;
+                this.targetStory.enableScroll();
+            }
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
@@ -159,13 +165,18 @@ define(function(require, exports, module) {
 
             this.xPos = data.p[0];
             if(this.direction === 'y') {
-                if(!this.storyScrollable) {
+                if(!this.storyScrollable && !this.storyFlipable) {
                     this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
                     this.swipable = true;
-                } else if(this.targetStory.top && data.v[1] > 0) {
+                } else if(this.storyScrollable && this.targetStory.top && data.v[1] > 0) {
                     this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
                     this.targetStory.disableScroll();
                     this.storyScrollable = false;
+                    this.swipable = true;
+                } else if(this.storyFlipable && this.targetStory.closed && data.v[1] > 0) {
+                    this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
+                    this.targetStory.enableScroll();
+                    this.storyFlipable = false;
                     this.swipable = true;
                 }
             }
@@ -180,6 +191,7 @@ define(function(require, exports, module) {
         this.ySync.on('end', (function(data) {
             this.direction = undefined;
             this.storyScrollable = false;
+            this.storyFlipable = false;
             this.storiesHandler.pipe(this.scrollview);
 
             this.storiesHandler.pipe(this.ySync);
