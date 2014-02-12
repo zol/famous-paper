@@ -46,7 +46,7 @@ define(function(require, exports, module) {
         };
 
         this.scrollview.sequenceFrom([this.content]);
-        this.content.pipe(this.scrollview);
+        // this.content.pipe(this.scrollview);
 
         this.mod = new Modifier({
             transform: FM.translate(0, -9999, 0)

@@ -149,7 +149,7 @@ define(function(require, exports, module) {
             if(this.yPos.get() === 0 && this.targetStory.flipable) {
                 this.swipable = false;
                 this.storyFlipable = true;
-                this.targetStory.enableScroll();
+                this.targetStory.enableFlip();
             }
         }.bind(this));
 
@@ -175,7 +175,7 @@ define(function(require, exports, module) {
                     this.swipable = true;
                 } else if(this.storyFlipable && this.targetStory.closed && data.v[1] > 0) {
                     this.yPos.set(Math.min(this.options.initY + 75, Math.max(-75, data.p[1])));
-                    this.targetStory.enableScroll();
+                    this.targetStory.enableFlip();
                     this.storyFlipable = false;
                     this.swipable = true;
                 }

@@ -76,6 +76,7 @@ define(function(require, exports, module) {
             return [320, 1068]
         };
 
+        this.content.pipe(this.scrollview);
         this.scrollview.sequenceFrom([this.content]);
 
         var svMod = new Modifier({
@@ -102,7 +103,7 @@ define(function(require, exports, module) {
             margin: window.innerHeight,
             drag: 0.001,
             edgeGrip: 1,
-            edgePeriod: Infinity,
+            edgePeriod: 300,
             // edgeDamp: 1,
             // paginated: false,
             // pagePeriod: 500,
@@ -117,6 +118,14 @@ define(function(require, exports, module) {
     ArticleTopView.prototype.setAngle = function(angle) {
         this.contMod.setTransform(FM.aboutOrigin([0, 320, 0], FM.rotateX(-angle)));
         this.thumbLgMod.setTransform(FM.moveThen([0, 320, 0], FM.aboutOrigin([0, 320, 0], FM.rotate(-angle + Math.PI, 0, 0))));
+    };
+
+    ArticleTopView.prototype.enableScroll = function() {
+        this.content.pipe(this.scrollview);
+    };
+
+    ArticleTopView.prototype.disableScroll = function() {
+        this.content.unpipe(this.scrollview);
     };
 
     module.exports = ArticleTopView;

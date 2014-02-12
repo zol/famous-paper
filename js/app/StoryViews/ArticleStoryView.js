@@ -47,17 +47,24 @@ define(function(require, exports, module) {
 
             this.sync.on('update', function(data) {
                 this.pos.set(data.p);
-                this.top = false;
+                this.open = false;
+
+                if(this.atTop && data.v[1] > 0) {
+                    this.article.disableScroll();
+                }
             }.bind(this));
 
             this.sync.on('end', function() {
                 if(this.angle < Math.PI/2) {
-                    this.pos.set(-320);
+                    this.pos.set(-320, this.options.curve);
                     this.articleScale.set(1, this.options.curve);
                     this.articleTop.set(0, this.options.curve);
                     this.closed = false;
+                    this.article.enableScroll();
                 } else {
+                    this.articleScale.set(0.875, this.options.curve);
                     this.pos.set(0, this.options.curve);
+                    this.articleTop.set(-68, this.options.curve); 
                     this.closed = true;
                 }
             }.bind(this));
@@ -156,7 +163,7 @@ define(function(require, exports, module) {
         margin: 20,
 
         curve: {
-            duration: 500,
+            duration: 300,
             curve: 'easeInOut'
         }
     };
@@ -172,14 +179,12 @@ define(function(require, exports, module) {
         return Utils.map(this.progress, 0, 1, start, end, clamp);
     };
 
-    ArticleStoryView.prototype.enableScroll = function() {
-        // this.cover.pipe(this.scrollview);
+    ArticleStoryView.prototype.enableFlip = function() {
         this.enable = true;
         this.article.pipe(this.sync);
     };
 
-    ArticleStoryView.prototype.disableScroll = function() {
-        // this.cover.unpipe(this.scrollview);
+    ArticleStoryView.prototype.disableFlip = function() {
         this.enable = false;
         this.article.unpipe(this.sync);
     };
@@ -190,9 +195,9 @@ define(function(require, exports, module) {
         this.angle = Utils.map(pos, 0, -320, Math.PI, 0, true);
         this.article.setAngle(this.angle);
 
-        console.log(pos, this.angle);
-
         var articleScale = this.articleScale.get();
+
+        // this.stopped = Math.abs(this.article.articleFull.scrollview.getVelocity()) < 0.01;
 
         var namePos = this.map(120, 85);
         var textPos = this.map(140, 105);
@@ -204,7 +209,7 @@ define(function(require, exports, module) {
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
-        this.top = this.angle === 0;
+        this.open = this.angle === 0;
 
         this.spec = [];
         this.spec.push(this.card.render());
