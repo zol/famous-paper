@@ -33,14 +33,6 @@ define(function(require, exports, module) {
         createArticleFull.call(this);
         createCover.call(this);
 
-        this.eventOutput.on('touchstart', function() {
-            this.touch = true;
-        });
-
-        this.eventOutput.on('touchend', function() {
-            this.touch = false;
-        });
-
         function createArticleTop() {
             this.articleTop = new ArticleTopView(this.options);
 
@@ -57,8 +49,8 @@ define(function(require, exports, module) {
         function createArticleFull() {
             this.articleFull = new ArticleFullView(this.options);
 
-            // this.articleBottom.pipe(this.eventOutput);
             this.articleFull.content.pipe(this.articleTop.scrollview);
+            this.articleFull.content.pipe(this.articleBottom.scrollview);
         }
 
         function createCover() {
@@ -132,30 +124,29 @@ define(function(require, exports, module) {
         // this.nameView.fade(this.progress);
         // this.textView.fade(this.progress);
 
+        this.atTop = Math.abs(this.articleTop.scrollview.getPosition()) < 1;
+        console.log(this.atTop);
+
         this.spec = [];
 
         // this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
         // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
-        var scrollPos = this.articleTop.scrollview.getPosition();
-        this.articleBottom.scrollview.setPosition(scrollPos);
-        this.articleFull.scrollview.setPosition(scrollPos);
+        this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
 
         this.spec.push({
             target: this.articleFull.render()
         });
 
-        this.stopped = Math.abs(this.articleTop.scrollview.getVelocity()) < 0.05;
-
-        if(!this.touch) {
+        if(this.angle === 0) {
             // this.articleFull.show();
         }
 
-        if(this.touch) {
+        // if(this.angle !== 0) {
             this.articleFull.hide();
 
             this.spec.push({
-                transform: FM.translate(0, 0, 0.0001),
+                transform: FM.translate(0, 0, 0),
                 target: this.articleTop.render()
             });
 
@@ -168,7 +159,7 @@ define(function(require, exports, module) {
                 transform: FM.translate(0, 0, 5),
                 // target: this.cover.render()
             });
-        }
+        // }
 
         return this.spec;
     };

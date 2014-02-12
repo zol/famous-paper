@@ -46,11 +46,13 @@ define(function(require, exports, module) {
             }.bind(this), {direction: Utility.Direction.Y});
 
             this.sync.on('update', function(data) {
-                this.pos.set(data.p);
-                this.open = false;
-
-                if(this.atTop && data.v[1] > 0) {
+                if(this.article.atTop && data.v > 0) {
                     this.article.disableScroll();
+                    this.open = false;
+                }
+
+                if(!this.open) {
+                    this.pos.set(data.p);
                 }
             }.bind(this));
 
@@ -60,6 +62,7 @@ define(function(require, exports, module) {
                     this.articleScale.set(1, this.options.curve);
                     this.articleTop.set(0, this.options.curve);
                     this.closed = false;
+                    this.open = true;
                     this.article.enableScroll();
                 } else {
                     this.articleScale.set(0.875, this.options.curve);
