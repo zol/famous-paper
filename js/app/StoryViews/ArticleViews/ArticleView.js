@@ -30,7 +30,7 @@ define(function(require, exports, module) {
 
         createArticleTop.call(this);
         createArticleBottom.call(this);
-        createArticleFull.call(this);
+        // createArticleFull.call(this);
         createCover.call(this);
 
         function createArticleTop() {
@@ -56,6 +56,8 @@ define(function(require, exports, module) {
         function createCover() {
             this.cover = new Surface();
             this.cover.pipe(this.eventOutput);
+            this.cover.pipe(this.articleTop.scrollview);
+            this.cover.pipe(this.articleBottom.scrollview);
 
             this.cover.on('touchstart', function() {
                 this.touch = true;
@@ -92,15 +94,17 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.enableScroll = function() {
-        this.enable = true;
+        // this.enable = true;
         this.articleTop.enableScroll();
-        this.articleBottom.content.pipe(this.articleTop.scrollview);
+        this.articleBottom.enableScroll();
+        // this.articleBottom.content.pipe(this.articleTop.scrollview);
     };
 
     ArticleView.prototype.disableScroll = function() {
-        this.enable = false;
+        // this.enable = false;
         this.articleTop.disableScroll();
-        this.articleBottom.content.unpipe(this.articleTop.scrollview);
+        this.articleBottom.disableScroll();
+        // this.articleBottom.content.unpipe(this.articleTop.scrollview);
     };
 
     ArticleView.prototype.sequence = function() {
@@ -124,7 +128,7 @@ define(function(require, exports, module) {
         // this.nameView.fade(this.progress);
         // this.textView.fade(this.progress);
 
-        this.atTop = Math.abs(this.articleTop.scrollview.getPosition()) < 1;
+        this.atTop = Math.abs(this.articleTop.scrollview.getPosition()) < 5;
         console.log(this.atTop);
 
         this.spec = [];
@@ -132,10 +136,10 @@ define(function(require, exports, module) {
         // this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
         // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
 
-        this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
+        // this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
 
         this.spec.push({
-            target: this.articleFull.render()
+            // target: this.articleFull.render()
         });
 
         if(this.angle === 0) {
@@ -143,7 +147,7 @@ define(function(require, exports, module) {
         }
 
         // if(this.angle !== 0) {
-            this.articleFull.hide();
+            // this.articleFull.hide();
 
             this.spec.push({
                 transform: FM.translate(0, 0, 0),
@@ -154,11 +158,12 @@ define(function(require, exports, module) {
                 transform: FM.translate(0, 320, 0),
                 target: this.articleBottom.render()
             });
-
+if(this.enable) {
             this.spec.push({
-                transform: FM.translate(0, 0, 5),
-                // target: this.cover.render()
+                transform: FM.translate(0, 0, 500),
+                target: this.cover.render()
             });
+        }
         // }
 
         return this.spec;

@@ -154,6 +154,10 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.ySync.on('update', (function(data) {
+            if(this.targetStory.flipable && !this.targetStory.closed) {
+                this.storiesHandler.unpipe(this.scrollview);
+            }
+
             if(!this.direction) {
                 if(Math.abs(data.v[1]) > Math.abs(data.v[0])) {
                     this.direction = 'y';
@@ -192,8 +196,8 @@ define(function(require, exports, module) {
             this.direction = undefined;
             this.storyScrollable = false;
             this.storyFlipable = false;
-            this.storiesHandler.pipe(this.scrollview);
 
+            this.storiesHandler.pipe(this.scrollview);
             this.storiesHandler.pipe(this.ySync);
 
             var velocity = data.v[1].toFixed(2);

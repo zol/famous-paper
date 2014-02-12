@@ -117,7 +117,7 @@ define(function(require, exports, module) {
 
     ArticleTopView.prototype.setAngle = function(angle) {
         this.contMod.setTransform(FM.aboutOrigin([0, 320, 0], FM.rotateX(-angle)));
-        this.thumbLgMod.setTransform(FM.moveThen([0, 320, 0.001], FM.aboutOrigin([0, 320, 0], FM.rotate(-angle + Math.PI, 0, 0))));
+        this.thumbLgMod.setTransform(FM.moveThen([0, 320, 0.01], FM.aboutOrigin([0, 320, 0], FM.rotate(-angle + Math.PI, 0, 0))));
     };
 
     ArticleTopView.prototype.enableScroll = function() {

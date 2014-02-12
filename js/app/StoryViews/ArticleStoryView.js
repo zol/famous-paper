@@ -46,6 +46,11 @@ define(function(require, exports, module) {
             }.bind(this), {direction: Utility.Direction.Y});
 
             this.sync.on('update', function(data) {
+                if(this.open && this.article.atTop && data.v > 0) {
+                    this.articleScale.set(0.875, this.options.curve);
+                    this.articleTop.set(-68, this.options.curve);
+                }
+
                 if(this.article.atTop && data.v > 0) {
                     this.article.disableScroll();
                     this.open = false;
@@ -64,11 +69,14 @@ define(function(require, exports, module) {
                     this.closed = false;
                     this.open = true;
                     this.article.enableScroll();
+                    this.article.enable = true;
                 } else {
                     this.articleScale.set(0.875, this.options.curve);
-                    this.pos.set(0, this.options.curve);
-                    this.articleTop.set(-68, this.options.curve); 
-                    this.closed = true;
+                    this.articleTop.set(-68, this.options.curve);
+                    this.pos.set(0, this.options.curve, function() {
+                        this.article.enable = false;
+                        this.closed = true;
+                    }.bind(this));
                 }
             }.bind(this));
         }
@@ -166,7 +174,7 @@ define(function(require, exports, module) {
         margin: 20,
 
         curve: {
-            duration: 300,
+            duration: 200,
             curve: 'easeInOut'
         }
     };
@@ -214,6 +222,12 @@ define(function(require, exports, module) {
 
         this.open = this.angle === 0;
 
+        if(this.open) {
+            this.article.articleBottom.noShadow();
+        } else {
+            this.article.articleBottom.shadow();
+        }
+
         this.spec = [];
         this.spec.push(this.card.render());
 
@@ -252,12 +266,12 @@ define(function(require, exports, module) {
             target: this.footer.render()
         });
 
-        if(!this.enable) {
-            this.spec.push({
-                transform: FM.translate(0, 0, 20),
-                // target: this.cover.render()
-            });
-        }
+        // if(!this.enable) {
+        //     this.spec.push({
+        //         transform: FM.translate(0, 0, 1000),
+        //         // target: this.cover.render()
+        //     });
+        // }
 
         return this.spec;
     };

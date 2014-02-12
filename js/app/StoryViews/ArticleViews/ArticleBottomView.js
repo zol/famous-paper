@@ -16,11 +16,10 @@ define(function(require, exports, module) {
     }
 
     function createBacking() {
-        var surface = new Surface({
+        this.backing = new Surface({
             size: [320, 320],
             properties: {
-                backgroundColor: 'white',
-                // boxShadow: this.options.boxShadow
+                boxShadow: this.options.boxShadow
             }
         });
 
@@ -28,7 +27,7 @@ define(function(require, exports, module) {
             origin: [0, 0]
         });
 
-        this._add(mod).link(surface);
+        this._add(mod).link(this.backing);
     }
 
     function createScrollview() {
@@ -83,7 +82,7 @@ define(function(require, exports, module) {
             margin: window.innerHeight,
             drag: 0.001,
             edgeGrip: 1,
-            edgePeriod: Infinity,
+            edgePeriod: 300,
             // edgeDamp: 1,
             // paginated: false,
             // pagePeriod: 500,
@@ -97,6 +96,26 @@ define(function(require, exports, module) {
 
     ArticleBottomView.prototype.setAngle = function(angle) {
         this.contMod.setTransform(FM.rotateX(0));
+    };
+
+    ArticleBottomView.prototype.enableScroll = function() {
+        this.content.pipe(this.scrollview);
+    };
+
+    ArticleBottomView.prototype.disableScroll = function() {
+        this.content.unpipe(this.scrollview);
+    };
+
+    ArticleBottomView.prototype.noShadow = function() {
+        this.backing.setProperties({
+            boxShadow: ''
+        });
+    };
+
+    ArticleBottomView.prototype.shadow = function() {
+        this.backing.setProperties({
+            boxShadow: this.options.boxShadow
+        });
     };
 
     module.exports = ArticleBottomView;
