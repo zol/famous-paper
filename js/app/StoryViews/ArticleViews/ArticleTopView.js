@@ -11,27 +11,10 @@ define(function(require, exports, module) {
     function ArticleTopView() {
         View.apply(this, arguments);
 
-        createCover.call(this);
         createContainer.call(this);
+        createCover.call(this);
         createBacking.call(this);
         createScrollview.call(this);
-    }
-
-    function createCover() {
-        this.coverLgImg = new Image();
-        this.coverLgImg.src = this.options.thumbCoverLg;
-        this.coverLgImg.width = 320;
-
-        this.coverLg = new Surface({
-            size: [undefined, window.innerHeight/2],
-            content: this.coverLgImg
-        });
-
-        this.thumbLgMod = new Modifier({
-            transform: FM.rotateZ(Math.PI)
-        });
-
-        this._add(this.thumbLgMod).link(this.cover);
     }
 
     function createContainer() {
@@ -41,17 +24,36 @@ define(function(require, exports, module) {
                 overflow: 'hidden'
             }
         });
+
+        this.container.pipe(this.eventOutput);
+    }
+
+    function createCover() {
+        this.coverLgImg = new Image();
+        this.coverLgImg.src = this.options.thumbLg;
+        this.coverLgImg.width = 320;
+
+        this.coverLg = new Surface({
+            size: [320, 320],
+            content: this.coverLgImg
+        });
+
+        this.thumbLgMod = new Modifier();
+
+        this.coverLg.pipe(this.eventOutput);
+
+        this._add(this.thumbLgMod).link(this.coverLg);
     }
 
     function createBacking() {
         var backing = new Surface({
-            size: [undefined, window.innerHeight/2],
+            size: [320, window.innerHeight/2],
             properties: {
                 backgroundColor: 'white'
             }
         });
 
-        this.container.add(backing);
+        // this.container.add(backing);
     }
 
     function createScrollview() {
@@ -76,7 +78,7 @@ define(function(require, exports, module) {
             origin: [0.5, 0]
         });
 
-        this.container.add(svMod).link(this.scrollview);
+        this.container.add(svMod).link(this.scrollview);    
 
         this.contMod = new Modifier();
         this._add(this.contMod).link(this.container);
@@ -87,8 +89,8 @@ define(function(require, exports, module) {
 
     ArticleTopView.DEFAULT_OPTIONS = {
         scale: null,
-        thumbCoverSm: null,
-        thumbCoverLg: null,
+        thumbSm: null,
+        thumbLg: null,
         content: null,
         svOpts: {
             itemSpacing: 0,
@@ -109,6 +111,7 @@ define(function(require, exports, module) {
 
     ArticleTopView.prototype.setAngle = function(angle) {
         this.contMod.setTransform(FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotateX(-angle)));
+        this.thumbLgMod.setTransform(FM.moveThen([0, window.innerHeight/2, 0], FM.aboutOrigin([0, window.innerHeight/2, 0], FM.rotate(-angle + Math.PI, 0, 0))));
     };
 
     module.exports = ArticleTopView;

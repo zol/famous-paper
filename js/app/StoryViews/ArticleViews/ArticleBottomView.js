@@ -46,6 +46,8 @@ define(function(require, exports, module) {
             return [320, 1068]
         };
 
+        this.content.pipe(this.eventOutput);
+
         this.scrollview.sequenceFrom([this.content]);
 
         this.svMod = new Modifier({

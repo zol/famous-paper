@@ -33,18 +33,18 @@ define(function(require, exports, module) {
         createArticleFull.call(this);
         createCover.call(this);
 
-        this.angle = new Transitionable(0);
-
         function createArticleTop() {
-            this.articleTop = new ArticleTopView({
-                content: this.options.content
-            });
+            this.articleTop = new ArticleTopView(this.options);
+
+            this.articleTop.pipe(this.eventOutput);
         }
 
         function createArticleBottom() {
             this.articleBottom = new ArticleBottomView({
                 content: this.options.content
             });
+
+            this.articleBottom.pipe(this.eventOutput);
         }
 
         function createArticleFull() {
@@ -94,29 +94,24 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.enableScroll = function() {
-        this.cover.pipe(this.scrollview1);
-        this.cover.pipe(this.scrollview2);
         this.enable = true;
     };
 
     ArticleView.prototype.disableScroll = function() {
-        this.cover.unpipe(this.scrollview1);
-        this.cover.unpipe(this.scrollview2);
         this.enable = false;
     };
 
     ArticleView.prototype.sequence = function() {
         console.log('sequence');
-        this.scrollview2.setVelocity(0);
-        this.scrollview2.setPosition(0);
-        // this.scrollview2.sequenceFrom(this.firstNode);
+    };
+
+    ArticleView.prototype.setAngle = function(angle) {
+        this.angle = angle;
     };
 
     ArticleView.prototype.render = function() {
-        var angle = this.angle.get();
-
-        this.articleTop.setAngle(angle);
-        this.articleBottom.setAngle(angle);
+        this.articleTop.setAngle(this.angle);
+        this.articleBottom.setAngle(this.angle);
         // var namePos = this.map(120, 85);
         // var textPos = this.map(140, 105);
         // var photoPos = this.map(-20, -68);
@@ -134,13 +129,13 @@ define(function(require, exports, module) {
 
         this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
 
-        if(angle === Math.PI) {
+        if(this.angle === 0) {
             this.spec.push({
                 target: this.articleFull.render()
             });
         }
 
-        if(angle !== Math.PI) {
+        // if(this.angle !== 0) {
             this.spec.push({
                 target: this.articleTop.render()
             });
@@ -154,7 +149,7 @@ define(function(require, exports, module) {
                 transform: FM.translate(0, 0, 2),
                 target: this.cover.render()
             });
-        }
+        // }
 
         return this.spec;
     };

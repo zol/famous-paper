@@ -176,7 +176,11 @@ define(function(require, exports, module) {
 
     ArticleStoryView.prototype.render = function() {
         var pos = this.pos.get();
-        console.log(pos);
+
+        var angle = Utils.map(pos, 0, -320, Math.PI-0.5, 0, true);
+        this.article.setAngle(angle);
+
+        // console.log(pos, angle);
 
         var namePos = this.map(120, 85);
         var textPos = this.map(140, 105);
@@ -188,7 +192,7 @@ define(function(require, exports, module) {
         this.nameView.fade(this.progress);
         this.textView.fade(this.progress);
 
-        this.top = this.article.angle.get() === 0 ? true: false;
+        this.top = angle === 0;
 
         this.spec = [];
         this.spec.push(this.card.render());
@@ -213,7 +217,7 @@ define(function(require, exports, module) {
             });
         }
 
-        var articleScale = 1;
+        var articleScale = 0.875;
 
         this.spec.push({
             origin: [0.5, 0],
