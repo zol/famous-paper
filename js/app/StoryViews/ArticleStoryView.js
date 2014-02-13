@@ -46,12 +46,14 @@ define(function(require, exports, module) {
             }.bind(this), {direction: Utility.Direction.Y});
 
             this.sync.on('update', function(data) {
+                if(this.progress !== 1) return;
+
                 if(this.open && this.article.atTop && data.v > 0) {
                     this.articleScale.set(0.875, this.options.curve);
                     this.articleTop.set(-68, this.options.curve);
                 }
 
-                if(this.article.atTop && data.v > 0) {
+                if(this.article.atTop && data.v > 0) { // closing top
                     this.article.disableScroll();
                     this.open = false;
                 }
@@ -191,12 +193,12 @@ define(function(require, exports, module) {
     };
 
     ArticleStoryView.prototype.enableFlip = function() {
-        this.enable = true;
+        // this.enable = true;
         this.article.pipe(this.sync);
     };
 
     ArticleStoryView.prototype.disableFlip = function() {
-        this.enable = false;
+        // this.enable = false;
         this.article.unpipe(this.sync);
     };
 

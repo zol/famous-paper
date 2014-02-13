@@ -120,7 +120,6 @@ define(function(require, exports, module) {
         this.scrollview.sequenceFrom(sequence);
 
         this.scrollview.on('paginate', function() {
-            console.log('paginate story')
             if(this.targetStory.sequence) {
                 this.targetStory.sequence();
                 this.targetStory.disableScroll();
@@ -235,7 +234,7 @@ define(function(require, exports, module) {
 
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
-        this.scrollview.emitPaginate = true;
+        if(this.targetStory.flipable) this.targetStory.enableFlip();
 
         this.yPos.set(0, spring, function() {
             this.state = 'up';
@@ -254,7 +253,6 @@ define(function(require, exports, module) {
 
         this.yPos.set(this.options.initY, spring, function() {
             this.state = 'down';
-            this.scrollview.emitPaginate = false;
         }.bind(this));
     };
 
