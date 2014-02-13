@@ -89,7 +89,7 @@ define(function(require, exports, module) {
             // pageDamp: 0.8,
             // pageStopSpeed: Infinity,
             // pageSwitchSpeed: 1,
-            speedLimit: 10
+            speedLimit: 1
         },
         boxShadow: null
     };

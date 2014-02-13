@@ -6819,6 +6819,8 @@ define('famous-views/Scrollview',['require','exports','module','famous/Utility',
         this._contextSize = [window.innerWidth, window.innerHeight];
 
         this._offsets = {};
+
+        this.emitPaginate = false;
     }
 
     function _handleStart(event) {
@@ -6957,6 +6959,14 @@ define('famous-views/Scrollview',['require','exports','module','famous/Utility',
 
                 if((velSwitch && velNext)|| (!velSwitch && posNext)) this.goToNextPage();
                 else _attachPageSpring.call(this);
+
+                var pos = Math.abs(this.getPosition());
+
+                if(pos > 2 && pos < 319) {
+                    Time.setTimeout(function() {
+                        this.eventOutput.emit('paginate');
+                    }.bind(this), 300);
+                }
                 // no need to handle prev case since the origin is already the 'previous' page
             }
         }
@@ -7086,9 +7096,6 @@ define('famous-views/Scrollview',['require','exports','module','famous/Utility',
             for(var i in this._offsets) this._offsets[i] += positionModification;
             _attachPageSpring.call(this);
 
-            Time.setTimeout(function() {
-                this.eventOutput.emit('paginate');
-            }.bind(this), 300);
         }
 
         return prevNode;
@@ -7104,10 +7111,13 @@ define('famous-views/Scrollview',['require','exports','module','famous/Utility',
             for(var i in this._offsets) this._offsets[i] -= positionModification;
             _attachPageSpring.call(this);
 
-            Time.setTimeout(function() {
-                this.eventOutput.emit('paginate');
-            }.bind(this), 300);
         }
+
+        // Time.setTimeout(function() {
+        //     this.eventOutput.emit('paginate');
+        //     debugger
+        // }.bind(this), 300);
+
         return nextNode;
     }
 
@@ -7306,7 +7316,7 @@ define('app/ArticleViews/ArticleBottomView',['require','exports','module','famou
             // pageDamp: 0.8,
             // pageStopSpeed: Infinity,
             // pageSwitchSpeed: 1,
-            speedLimit: 10
+            speedLimit: 1
         },
         boxShadow: null
     };
@@ -7542,7 +7552,7 @@ define('app/ArticleViews/ArticleTopView',['require','exports','module','famous/E
             // pageDamp: 0.8,
             // pageStopSpeed: Infinity,
             // pageSwitchSpeed: 1,
-            speedLimit: 10
+            speedLimit: 1
         },
         boxShadow: null
     };
@@ -8686,7 +8696,6 @@ define('app/ArticleViews/ArticleView',['require','exports','module','famous/Engi
         // this.textView.fade(this.progress);
 
         this.atTop = Math.abs(this.articleTop.scrollview.getPosition()) < 5;
-        console.log(this.atTop);
 
         this.spec = [];
 
@@ -9534,12 +9543,14 @@ define('app/StoryViews/ArticleStoryView',['require','exports','module','famous/E
             }.bind(this), {direction: Utility.Direction.Y});
 
             this.sync.on('update', function(data) {
+                if(this.progress !== 1) return;
+
                 if(this.open && this.article.atTop && data.v > 0) {
                     this.articleScale.set(0.875, this.options.curve);
                     this.articleTop.set(-68, this.options.curve);
                 }
 
-                if(this.article.atTop && data.v > 0) {
+                if(this.article.atTop && data.v > 0) { // closing top
                     this.article.disableScroll();
                     this.open = false;
                 }
@@ -9679,12 +9690,12 @@ define('app/StoryViews/ArticleStoryView',['require','exports','module','famous/E
     };
 
     ArticleStoryView.prototype.enableFlip = function() {
-        this.enable = true;
+        // this.enable = true;
         this.article.pipe(this.sync);
     };
 
     ArticleStoryView.prototype.disableFlip = function() {
-        this.enable = false;
+        // this.enable = false;
         this.article.unpipe(this.sync);
     };
 
@@ -9909,7 +9920,7 @@ define('app/StoryViews/PhotoStoryView',['require','exports','module','famous/Eng
                 edgeGrip: 1,
                 edgePeriod: 300,
                 // edgeDamp: 1,
-                // paginated: false,
+                paginated: false,
                 // pagePeriod: 500,
                 // pageDamp: 0.8,
                 // pageStopSpeed: Infinity,
@@ -10329,7 +10340,7 @@ define('app/StoryViews/StoriesView',['require','exports','module','famous/Engine
         this.scrollview.sequenceFrom(sequence);
 
         this.scrollview.on('paginate', function() {
-            if(this.targetStory.scrollable) {
+            if(this.targetStory.sequence) {
                 this.targetStory.sequence();
                 this.targetStory.disableScroll();
             }
@@ -10443,6 +10454,7 @@ define('app/StoryViews/StoriesView',['require','exports','module','famous/Engine
 
         this.options.scrollOpts.paginated = true;
         this.scrollview.setOptions(this.options.scrollOpts);
+        if(this.targetStory.flipable) this.targetStory.enableFlip();
 
         this.yPos.set(0, spring, function() {
             this.state = 'up';
