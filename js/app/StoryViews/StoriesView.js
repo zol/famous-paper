@@ -65,8 +65,7 @@ define(function(require, exports, module) {
         pagePeriod: 300,
         pageDamp: 1,
         speedLimit: 10,
-        drag: 0.001,
-        friction: 0
+        drag: 0.001
     };
 
     var createStories = function() {
