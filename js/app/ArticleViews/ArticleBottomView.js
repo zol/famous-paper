@@ -19,6 +19,7 @@ define(function(require, exports, module) {
         this.backing = new Surface({
             size: [320, 320],
             properties: {
+                backgroundColor: 'white',
                 boxShadow: this.options.boxShadow
             }
         });

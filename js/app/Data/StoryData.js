@@ -1,12 +1,12 @@
 define(function(require, exports, module) {
     module.exports = [
         {
-            name: 'Sarah Foster',
+            name: 'Zita Molnar',
             profilePics: 
                 [
-                    './img/profile-pics/sarah.jpg'
+                    './img/profile-pics/zita.jpg'
                 ],
-            text: 'IT\'S GO TIME!!',
+            text: 'Sometimes walking in the San Francisco rain, without an umbrella, feels good.',
             time: 'JUST NOW &#8226; FRIENDS',
             likes: 2,
             comments: 3
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
                 [
                     './img/profile-pics/nat.jpg'
                 ],
-            text: '"That song is so corny and i love you."',
+            text: 'Eat some kale today!',
             time: '8 HRS',
             likes: 3,
             comments: 2
