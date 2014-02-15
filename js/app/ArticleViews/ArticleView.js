@@ -8,9 +8,7 @@ define(function(require, exports, module) {
     var View                = require('famous/View');
     var Easing              = require('famous-animation/Easing');
     var ContainerSurface    = require('famous/ContainerSurface');
-    // var GenericSync         = require('famous-sync/GenericSync');
     var Transitionable      = require('famous/Transitionable');
-    // var SpringTransition    = require('famous-physics/utils/SpringTransition');
     var Scrollview          = require('famous-views/Scrollview');
     var ContainerSurface    = require('famous/ContainerSurface');
     var Utility             = require('famous/Utility');
@@ -19,9 +17,6 @@ define(function(require, exports, module) {
 
     var ArticleTopView      = require('./ArticleTopView');
     var ArticleBottomView   = require('./ArticleBottomView');
-    var ArticleFullView     = require('./ArticleFullView');
-
-    // Transitionable.registerMethod('spring', SpringTransition);
 
     function ArticleView() {
         View.apply(this, arguments);
@@ -30,6 +25,7 @@ define(function(require, exports, module) {
 
         createArticleTop.call(this);
         createArticleBottom.call(this);
+        createCover.call(this);
 
         function createArticleTop() {
             this.articleTop = new ArticleTopView(this.options);
@@ -42,6 +38,13 @@ define(function(require, exports, module) {
 
             this.articleBottom.pipe(this.eventOutput);
             this.articleBottom.content.pipe(this.articleTop.scrollview);
+        }
+
+        function createArticleFull() {
+            this.articleFull = new ArticleFullView(this.options);
+
+            this.articleFull.content.pipe(this.articleTop.scrollview);
+            this.articleFull.content.pipe(this.articleBottom.scrollview);
         }
 
         function createCover() {
@@ -85,11 +88,13 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.enableScroll = function() {
+        // this.enable = true;
         this.articleTop.enableScroll();
         this.articleBottom.enableScroll();
     };
 
     ArticleView.prototype.disableScroll = function() {
+        // this.enable = false;
         this.articleTop.disableScroll();
         this.articleBottom.disableScroll();
     };
@@ -119,6 +124,13 @@ define(function(require, exports, module) {
             transform: FM.translate(0, 320, 0),
             target: this.articleBottom.render()
         });
+
+        if(this.enable) {
+            this.spec.push({
+                transform: FM.translate(0, 0, 500),
+                target: this.cover.render()
+            });
+        }
 
         return this.spec;
     };

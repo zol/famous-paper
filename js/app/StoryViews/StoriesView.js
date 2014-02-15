@@ -91,6 +91,7 @@ define(function(require, exports, module) {
                 info.content = StoryData[i].article;
                 info.thumbSm = StoryData[i].articleThumbSm;
                 info.thumbLg = StoryData[i].articleThumbLg;
+                info.velThreshold = this.options.velThreshold;
 
                 story = new ArticleStoryView(info);
             } else {

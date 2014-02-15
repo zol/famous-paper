@@ -62,22 +62,20 @@ define(function(require, exports, module) {
                 }
             }.bind(this));
 
-            this.sync.on('end', function() {
+            this.sync.on('end', function(data) {
+                console.log(this.angle, data.v)
                 if(this.angle < Math.PI/2) {
-                    this.pos.set(-320, this.options.curve);
-                    this.articleScale.set(1, this.options.curve);
-                    this.articleTop.set(0, this.options.curve);
-                    this.closed = false;
-                    this.open = true;
-                    this.article.enableScroll();
-                    this.article.enable = true;
+                    if(data.v > this.options.velThreshold && this.article.atTop) {
+                        this.flipClose();
+                    } else {
+                        this.flipOpen();
+                    }
                 } else {
-                    this.articleScale.set(0.875, this.options.curve);
-                    this.articleTop.set(-68, this.options.curve);
-                    this.pos.set(0, this.options.curve, function() {
-                        this.article.enable = false;
-                        this.closed = true;
-                    }.bind(this));
+                    if(data.v < -this.options.velThreshold) {
+                        this.flipOpen();
+                    } else {
+                        this.flipClose();
+                    }
                 }
             }.bind(this));
         }
@@ -166,7 +164,8 @@ define(function(require, exports, module) {
         curve: {
             duration: 200,
             curve: 'easeInOut'
-        }
+        },
+        velThreshold: 1
     };
 
     ArticleStoryView.prototype.getSize = function() {
@@ -186,6 +185,25 @@ define(function(require, exports, module) {
 
     ArticleStoryView.prototype.disableFlip = function() {
         this.article.unpipe(this.sync);
+    };
+
+    ArticleStoryView.prototype.flipOpen = function() {
+        this.pos.set(-320, this.options.curve);
+        this.articleScale.set(1, this.options.curve);
+        this.articleTop.set(0, this.options.curve);
+        this.closed = false;
+        this.open = true;
+        this.article.enableScroll();
+        this.article.enable = true;
+    };
+
+    ArticleStoryView.prototype.flipClose = function() {
+        this.pos.set(0, this.options.curve, function() {
+            this.article.enable = false;
+            this.closed = true;
+        }.bind(this));
+        this.articleScale.set(0.875, this.options.curve);
+        this.articleTop.set(-68, this.options.curve);
     };
 
     ArticleStoryView.prototype.render = function() {

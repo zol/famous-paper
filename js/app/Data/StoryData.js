@@ -1,6 +1,17 @@
 define(function(require, exports, module) {
     module.exports = [
         {
+            name: 'Nathalie Pickens',
+            profilePics: 
+                [
+                    './img/profile-pics/nat.jpg'
+                ],
+            text: 'Eat some kale today!',
+            time: '8 HRS',
+            likes: 3,
+            comments: 2
+        },
+        {
             name: 'Zita Molnar',
             profilePics: 
                 [
@@ -23,25 +34,34 @@ define(function(require, exports, module) {
             comments: 9
         },
         {
-            name: 'Jane Williams',
-            profilePics:
+            name: 'RJ Pickens',
+            profilePics: 
                 [
-                    './img/profile-pics/jane.jpg'
+                    './img/profile-pics/rj.jpg'
                 ],
-            text: 'Hilarious! #goodguyroy',
-            time: '4 HRS &#8226; PUBLIC',
-            likes: 4,
-            comments: 2,
-            articleThumbSm: './img/roy/roysm.jpg',
-            articleThumbLg: './img/roy/roylg.jpg',
-            article:
-                '<img src="./img/roy/header.png" width="320" />' +
-                '<div style="padding:0 20px;"><h1>I Could Watch Roy Hibbert Blocking This Little Kid\'s Shot All Day Long</h1>' +
-                '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
-                '<p>Indiana Pacers big man Roy Hibbert visited Paramount School of Excellence in Indianapolis and relived his childhood when he wasn\'t yet an NBA star for a cute video. The best part is when he swats the crap out of a kid\'s weak layup, which has been GIFed below. (Second-best part is Hibbert using a child as a human shield in dodgeball.)</p>' +
-                // '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
-                '<img width="280" src="./img/roy/block.jpg" />' +
-                '<p>The GIF\'s really missing the crushing thump of Hibbert\'s hand on the rejection, so watch the video for the full experience.</p></div>'
+            text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
+            photos: 
+                [
+                    './img/rj/photos/1.jpg'
+                ],
+            time: '2 MINS &#8226; FRIENDS',
+            likes: 10,
+            comments: 2
+        },
+        {
+            name: 'Scuba Steve',
+            profilePics: 
+                [
+                    './img/profile-pics/scuba.jpg'
+                ],
+            text: 'Eric Prydz EPIC 2.0!!!! \\o/',
+            photos:
+                [
+                    './img/scuba/photos/1.jpg'
+                ],
+            time: '12 HRS',
+            likes: 5,
+            comments: 3
         },
         {
             name: 'Shupac Takur added 4 new photos with Lee-ann Platt and 5 others',
@@ -67,41 +87,25 @@ define(function(require, exports, module) {
             comments: 4
         },
         {
-            name: 'Scuba Steve',
-            profilePics: 
+            name: 'Jane Williams',
+            profilePics:
                 [
-                    './img/profile-pics/scuba.jpg'
+                    './img/profile-pics/jane.jpg'
                 ],
-            text: 'In other news I\'m a TOP Sidecar driver now, so if you want a discount code hit me up. Also we operate in East Bay now! Woot!',
-            time: '12 HRS',
-            likes: 5,
-            comments: 3
-        },
-        {
-            name: 'RJ Pickens',
-            profilePics: 
-                [
-                    './img/profile-pics/rj.jpg'
-                ],
-            text: 'Man, these are some good-looking speakers. #AISAudio #VOIDAudio',
-            photos: 
-                [
-                    './img/rj/photos/1.jpg'
-                ],
-            time: '2 MINS &#8226; FRIENDS',
-            likes: 10,
-            comments: 2
-        },
-        {
-            name: 'Nathalie Pickens',
-            profilePics: 
-                [
-                    './img/profile-pics/nat.jpg'
-                ],
-            text: 'Eat some kale today!',
-            time: '8 HRS',
-            likes: 3,
-            comments: 2
-        },
+            text: 'Hilarious! #goodguyroy',
+            time: '4 HRS &#8226; PUBLIC',
+            likes: 4,
+            comments: 2,
+            articleThumbSm: './img/roy/roysm.jpg',
+            articleThumbLg: './img/roy/roylg.jpg',
+            article:
+                '<img src="./img/roy/header.png" width="320" />' +
+                '<div style="padding:0 20px;"><h1>I Could Watch Roy Hibbert Blocking This Little Kid\'s Shot All Day Long</h1>' +
+                '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
+                '<p>Indiana Pacers big man Roy Hibbert visited Paramount School of Excellence in Indianapolis and relived his childhood when he wasn\'t yet an NBA star for a cute video. The best part is when he swats the crap out of a kid\'s weak layup, which has been GIFed below. (Second-best part is Hibbert using a child as a human shield in dodgeball.)</p>' +
+                // '<iframe width="280" height="158" src="//www.youtube.com/embed/BY69NUNsF1Q?rel=0&showinfo=0" frameborder="0" allowfullscreen></iframe>' +
+                '<img width="280" src="./img/roy/block.jpg" />' +
+                '<p>The GIF\'s really missing the crushing thump of Hibbert\'s hand on the rejection, so watch the video for the full experience.</p></div>'
+        }
     ]
 });
