@@ -36,7 +36,6 @@ define(function(require, exports, module) {
         createText.call(this);
         createArticle.call(this);
         createFooter.call(this);
-        createCover.call(this);
 
         function createSync() {
             this.pos = new Transitionable(0);
@@ -132,7 +131,6 @@ define(function(require, exports, module) {
             });
 
             this.article.pipe(this.eventOutput);
-            // this.article.pipe(this.sync);
 
             this.articleScale = new Transitionable(0.875);
             this.articleTop = new Transitionable(-68);
@@ -145,16 +143,6 @@ define(function(require, exports, module) {
             });
 
             this.footer.pipe(this.eventOutput);
-        }
-
-        function createCover() {
-            this.cover = new Surface({
-                properties: {
-                    backgroundColor: 'blue'
-                }
-            });
-
-            this.cover.pipe(this.eventOutput);
         }
     }
 
@@ -193,12 +181,10 @@ define(function(require, exports, module) {
     };
 
     ArticleStoryView.prototype.enableFlip = function() {
-        // this.enable = true;
         this.article.pipe(this.sync);
     };
 
     ArticleStoryView.prototype.disableFlip = function() {
-        // this.enable = false;
         this.article.unpipe(this.sync);
     };
 
@@ -209,8 +195,6 @@ define(function(require, exports, module) {
         this.article.setAngle(this.angle);
 
         var articleScale = this.articleScale.get();
-
-        // this.stopped = Math.abs(this.article.articleFull.scrollview.getVelocity()) < 0.01;
 
         var namePos = this.map(120, 85);
         var textPos = this.map(140, 105);
@@ -267,13 +251,6 @@ define(function(require, exports, module) {
             opacity: Easing.inOutQuadNorm.call(this, this.progress),
             target: this.footer.render()
         });
-
-        // if(!this.enable) {
-        //     this.spec.push({
-        //         transform: FM.translate(0, 0, 1000),
-        //         // target: this.cover.render()
-        //     });
-        // }
 
         return this.spec;
     };

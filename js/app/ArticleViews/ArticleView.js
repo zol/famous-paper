@@ -30,8 +30,6 @@ define(function(require, exports, module) {
 
         createArticleTop.call(this);
         createArticleBottom.call(this);
-        // createArticleFull.call(this);
-        createCover.call(this);
 
         function createArticleTop() {
             this.articleTop = new ArticleTopView(this.options);
@@ -44,13 +42,6 @@ define(function(require, exports, module) {
 
             this.articleBottom.pipe(this.eventOutput);
             this.articleBottom.content.pipe(this.articleTop.scrollview);
-        }
-
-        function createArticleFull() {
-            this.articleFull = new ArticleFullView(this.options);
-
-            this.articleFull.content.pipe(this.articleTop.scrollview);
-            this.articleFull.content.pipe(this.articleBottom.scrollview);
         }
 
         function createCover() {
@@ -94,17 +85,13 @@ define(function(require, exports, module) {
     };
 
     ArticleView.prototype.enableScroll = function() {
-        // this.enable = true;
         this.articleTop.enableScroll();
         this.articleBottom.enableScroll();
-        // this.articleBottom.content.pipe(this.articleTop.scrollview);
     };
 
     ArticleView.prototype.disableScroll = function() {
-        // this.enable = false;
         this.articleTop.disableScroll();
         this.articleBottom.disableScroll();
-        // this.articleBottom.content.unpipe(this.articleTop.scrollview);
     };
 
     ArticleView.prototype.sequence = function() {
@@ -118,52 +105,20 @@ define(function(require, exports, module) {
     ArticleView.prototype.render = function() {
         this.articleTop.setAngle(this.angle);
         this.articleBottom.setAngle(this.angle);
-        // var namePos = this.map(120, 85);
-        // var textPos = this.map(140, 105);
-        // var photoPos = this.map(-20, -68);
-        // var footerPos = this.map(48, 0);
-
-        // this.profilePicsView.setProgress(this.progress);
-        // this.nameView.setProgress(this.progress);
-        // this.nameView.fade(this.progress);
-        // this.textView.fade(this.progress);
 
         this.atTop = Math.abs(this.articleTop.scrollview.getPosition()) < 5;
 
         this.spec = [];
 
-        // this.mod0.setTransform(FM.translate(0, this.map(0, 0), 0.00001));
-        // this.mod1.setTransform(FM.move(FM.rotateZ(this.map(-0.04, 0)), [this.map(-6, 0), this.map(-290, 0), 0]));
-
-        // this.articleBottom.scrollview.setPosition(this.articleTop.scrollview.getPosition());
-
         this.spec.push({
-            // target: this.articleFull.render()
+            transform: FM.translate(0, 0, 0),
+            target: this.articleTop.render()
         });
 
-        if(this.angle === 0) {
-            // this.articleFull.show();
-        }
-
-        // if(this.angle !== 0) {
-            // this.articleFull.hide();
-
-            this.spec.push({
-                transform: FM.translate(0, 0, 0),
-                target: this.articleTop.render()
-            });
-
-            this.spec.push({
-                transform: FM.translate(0, 320, 0),
-                target: this.articleBottom.render()
-            });
-if(this.enable) {
-            this.spec.push({
-                transform: FM.translate(0, 0, 500),
-                target: this.cover.render()
-            });
-        }
-        // }
+        this.spec.push({
+            transform: FM.translate(0, 320, 0),
+            target: this.articleBottom.render()
+        });
 
         return this.spec;
     };
