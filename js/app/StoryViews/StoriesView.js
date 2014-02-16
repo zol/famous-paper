@@ -35,7 +35,7 @@ define(function(require, exports, module) {
     StoriesView.prototype.constructor = StoriesView;
 
     StoriesView.DEFAULT_OPTIONS = {
-        velThreshold: 1,
+        velThreshold: 0.7,
         spring: {
             method: 'spring',
             period: 200,

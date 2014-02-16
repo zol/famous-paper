@@ -45,6 +45,7 @@ define(function(require, exports, module) {
             }.bind(this), {direction: Utility.Direction.Y});
 
             this.sync.on('update', function(data) {
+                this.closed = false;
                 if(this.progress !== 1) return;
 
                 if(this.open && this.article.atTop && data.v > 0) {
