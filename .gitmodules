@@ -31,3 +31,12 @@
 [submodule "js/famous-performance"]
 	path = js/famous-performance
 	url = git@github.com:Famous/famous-performance.git
+[submodule "js/famous-math"]
+	path = js/famous-math
+	url = git@github.com:Famous/math.git
+[submodule "js/surface-extensions"]
+	path = js/surface-extensions
+	url = git@github.com:Famous/surface-extensions.git
+[submodule "pkgtool"]
+	path = pkgtool
+	url = git@github.com:Famous/pkgtool.git
